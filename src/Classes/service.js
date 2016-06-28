@@ -1,18 +1,18 @@
 'use strict'
 
 let BasicDocument = require('./basic.js');
+let GlobalService = require('./global-service.js');
 
-class Service extends BasicDocument {
-	static description() {
-		return {
-			"key": "service-%department%-%counter%",
-			"parent": "global-service",
-			"counter": "service-counter"
-		};
-	}
-	constructor(params) {
+class Service extends GlobalService {
+  static description() {
+    return {
+      "key": "service-{department}-{counter}",
+      "counter": "service-counter"
+    };
+  }
+  constructor(params) {
 
-	}
+  }
 }
 
 module.exports = Service;
