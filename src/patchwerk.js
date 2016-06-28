@@ -45,21 +45,13 @@ class Patchwerk {
 		if (!is_colletction) return Promise.resolve([query])
 
 		if (query.counter == '*') {
+			let counterquery = _.cloneDeep(query);
+			_.unset(counterquery, 'counter');
 			let counter_name = Model.description().counter;
-			let Counter_Model = discover(counter_name);
-			let template = Counter_Model.description().key;
-			//@NOTE: should rework it anyway
-			let key = this.applyTemplate(template, query);
 
-			return this.emitter.addTask('database.get', key)
-				.then(data => {
-					let counter = new Counter_Model(key, data);
-					return _.map(counter.range(), n => {
-						let t = _.clone(query);
-						t.counter = n;
-						return t;
-					});
-				});
+			return this.get(counter_name, counterquery)
+				.then(counter => counter.range())
+				.then(range => _.map(range, index => _.set(_.clone(query), 'counter', index)));
 		}
 	}
 	composeDescription(Model, params) {
@@ -70,20 +62,19 @@ class Patchwerk {
 		return this.templatize(keys, params);
 	}
 	templatize(key_templates, values) {
-		let result = [];
-
 		return _.map(values, value => _.map(key_templates, base => this.applyTemplate(base, value)));
 	}
 	applyTemplate(template_string, params) {
 		return _.reduce(params, (template, value, param) => template.replace('{' + param + '}', value), template_string);
 	}
 	resolveParents(Model, acc) {
-		let parent = Object.getPrototypeOf(Model) || false;
+		let parent = Object.getPrototypeOf(Model) || {};
 
 		if (_.isFunction(parent.description)) {
 			acc.push(parent);
 			this.resolveParents(parent, acc);
 		}
+
 		return acc;
 	}
 }

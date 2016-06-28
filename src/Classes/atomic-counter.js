@@ -3,9 +3,9 @@
 let _ = require('lodash');
 
 class AtomicCounter {
-	constructor(id, data) {
+	constructor(id, datachain) {
 		this.id = id;
-		this.value = data.value;
+		this.value = datachain[0].value;
 	}
 	range() {
 		if (!_.isNumber(this.value)) throw new Error('Atomic counter value is not a number');

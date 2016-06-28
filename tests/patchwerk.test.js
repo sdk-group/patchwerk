@@ -50,7 +50,16 @@ describe('Fresh data!', () => {
 			date: "2016-06-20",
 			counter: '*'
 		}).then(d => {
-			// console.log(d)
+			console.log(d.length)
+		})
+	});
+
+	it('ActiveWorkstation', () => {
+		p.get('ActiveWorkstation', {
+			department: "department-1",
+			counter: '*'
+		}).then(d => {
+			console.log(d.length)
 		})
 	});
 });

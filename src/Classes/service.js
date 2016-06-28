@@ -1,6 +1,5 @@
 'use strict'
 
-let BasicDocument = require('./basic.js');
 let GlobalService = require('./global-service.js');
 
 class Service extends GlobalService {
