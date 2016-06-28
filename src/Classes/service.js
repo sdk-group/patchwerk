@@ -4,15 +4,12 @@ let BasicDocument = require('./basic.js');
 let GlobalService = require('./global-service.js');
 
 class Service extends GlobalService {
-  static description() {
-    return {
-      "key": "service-{department}-{counter}",
-      "counter": "service-counter"
-    };
-  }
-  constructor(params) {
-
-  }
+	static description() {
+		return {
+			"key": "service-{department}-{counter}",
+			"counter": "service-counter"
+		};
+	}
 }
 
 module.exports = Service;

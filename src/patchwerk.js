@@ -2,51 +2,90 @@
 
 let _ = require('lodash');
 
-let discover = function(model_name) {
-  let name = _.kebabCase(model_name);
-  return require(`./Classes/${name}.js`)
+let discover = function (model_name) {
+	let name = _.kebabCase(model_name);
+	return require(`./Classes/${name}.js`)
 }
 
 class Patchwerk {
-  constructor(emitter) {
-    this.emitter = emitter;
-  }
-  get(model_name, query) {
-    let Model = discover(model_name);
-    let is_colletction = this.isColletction(model_name, query);
-    let Description = this.composeDescription(Model, query);
-  }
-  isColletction(model_name, query) {
-    //@NOTE: temp
-    let counter = query.counter;
+	constructor(emitter) {
+		this.emitter = emitter;
+	}
+	get(model_name, query) {
+		let Model = discover(model_name);
+		let is_colletction = this.isColletction(Model, query);
 
-    return query.counter == '*' || _.isArray(query.counter);
-  }
-  composeDescription(Model, query) {
-    let description = Model.description();
-    let chain = this.resolveParents(Model, [Model]);
+		return this.processQuery(Model, query)
+			.then(params => this.composeDescription(Model, params))
+			.then(keyset => {
+				let uniq_subset = _.uniq(_.flatten(keyset));
 
-    let keys = _.map(chain, i => i.description().key);
-    let params = _.keys(query);
+				return this.emitter.addTask('database.getMulti', uniq_subset)
+					.then((data) => {
+						let composed = _.map(keyset, keys => {
+							let datachain = _.map(keys, key => data[key]);
+							let id = _.head(keys);
 
-    let complete = _.map(keys, k => {
-      let t = k;
-      _.forEach(params, param => {
-        t = t.replace('{' + param + '}', query[param]);
-      });
-      return t;
-    });
-    console.log(complete);
-  }
-  resolveParents(Model, acc) {
-    let parent = Object.getPrototypeOf(Model) || false;
+							return new Model(id, datachain);
+						});
 
-    if (_.isFunction(parent.description)) {
-      acc.push(parent);
-      this.resolveParents(parent, acc);
-    }
-    return acc;
-  }
+						return is_colletction ? composed : _.head(composed);
+					});
+			});
+	}
+	isColletction(Model, query) {
+		//@NOTE: temp
+		let counter = query.counter;
+
+		return query.counter == '*' || _.isArray(query.counter);
+	}
+	processQuery(Model, query) {
+		let is_colletction = this.isColletction(Model, query);
+
+		if (!is_colletction) return Promise.resolve([query])
+
+		if (query.counter == '*') {
+			let counter_name = Model.description().counter;
+			let Counter_Model = discover(counter_name);
+			let template = Counter_Model.description().key;
+			//@NOTE: should rework it anyway
+			let key = this.applyTemplate(template, query);
+
+			return this.emitter.addTask('database.get', key)
+				.then(data => {
+					let counter = new Counter_Model(key, data);
+					return _.map(counter.range(), n => {
+						let t = _.clone(query);
+						t.counter = n;
+						return t;
+					});
+				});
+		}
+	}
+	composeDescription(Model, params) {
+		let description = Model.description();
+		let chain = this.resolveParents(Model, [Model]);
+		let keys = _.map(chain, i => i.description().key);
+
+		return this.templatize(keys, params);
+	}
+	templatize(key_templates, values) {
+		let result = [];
+
+		return _.map(values, value => _.map(key_templates, base => this.applyTemplate(base, value)));
+	}
+	applyTemplate(template_string, params) {
+		return _.reduce(params, (template, value, param) => template.replace('{' + param + '}', value), template_string);
+	}
+	resolveParents(Model, acc) {
+		let parent = Object.getPrototypeOf(Model) || false;
+
+		if (_.isFunction(parent.description)) {
+			acc.push(parent);
+			this.resolveParents(parent, acc);
+		}
+		return acc;
+	}
 }
 
 

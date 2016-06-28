@@ -46,7 +46,8 @@
     "gulp-plumber": "^1.1.0",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-uglify": "^1.5.3",
-    "gulp-watch": "^4.3.5"
+    "gulp-watch": "^4.3.5",
+    "iris-service-database": "git+https://github.com/sdk-group/iris-service-database.git"
   },
   "dependencies": {
     "bluebird": "^3.3.4",

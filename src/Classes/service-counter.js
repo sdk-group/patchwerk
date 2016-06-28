@@ -3,14 +3,11 @@
 let AtomicCounter = require('./atomic-counter.js');
 
 class ServiceCounter extends AtomicCounter {
-  static description() {
-    return {
-      "key": "service-counter-%department%"
-    }
-  }
-  constructor() {
-
-  }
+	static description() {
+		return {
+			"key": "counter-service"
+		}
+	}
 }
 
 module.exports = ServiceCounter;
