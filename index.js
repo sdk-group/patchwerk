@@ -1,1 +1,1 @@
-module.exports = require("./build/Database");
+module.exports = require("./build");
