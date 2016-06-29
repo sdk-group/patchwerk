@@ -10,7 +10,7 @@ class BasicDocument {
 	}
 	processDatachain(datachain) {
 		let composed = _.transform(datachain, (result, item) => {
-			_.defaults(result, item.value);
+			!!item && _.defaults(result, item.value);
 		}, {});
 
 		_.forEach(composed, (value, key) => {
@@ -18,7 +18,6 @@ class BasicDocument {
 			this.owners[key] = this._ownerOf(key, datachain);
 		})
 	}
-
 	_ownerOf(param_name, datachain) {
 		let owner = false;
 		_.forEach(datachain, (d, index) => {

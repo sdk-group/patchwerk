@@ -40,8 +40,7 @@ describe('Fresh data!', () => {
 			department: "department-1",
 			counter: 1
 		}).then(d => {
-			// console.log(d)
-			console.log(d.id);
+			console.log(d);
 		})
 	});
 	it('Collection', () => {
@@ -60,6 +59,16 @@ describe('Fresh data!', () => {
 			counter: '*'
 		}).then(d => {
 			console.log(d.length)
+		})
+	});
+
+	it('ServiceRoutingMap', () => {
+		p.get('ServiceRoutingMap', {
+			department: "department-1"
+		}).then(d => {
+			console.log(d);
+			let r = d.getRoutes('service-1');
+			console.log(r);
 		})
 	});
 });

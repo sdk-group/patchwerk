@@ -13,7 +13,7 @@ class Patchwerk {
 	}
 	get(model_name, query) {
 		let Model = discover(model_name);
-		let is_colletction = this.isColletction(Model, query);
+		let is_colletction = this.isCollection(Model, query);
 
 		return this.processQuery(Model, query)
 			.then(params => this.composeDescription(Model, params))
@@ -33,14 +33,14 @@ class Patchwerk {
 					});
 			});
 	}
-	isColletction(Model, query) {
+	isCollection(Model, query) {
 		//@NOTE: temp
 		let counter = query.counter;
 
 		return query.counter == '*' || _.isArray(query.counter);
 	}
 	processQuery(Model, query) {
-		let is_colletction = this.isColletction(Model, query);
+		let is_colletction = this.isCollection(Model, query);
 
 		if (!is_colletction) return Promise.resolve([query])
 
