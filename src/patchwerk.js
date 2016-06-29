@@ -11,8 +11,9 @@ class Patchwerk {
 	constructor(emitter) {
 		this.emitter = emitter;
 	}
-	get(model_name, query) {
-		let Model = discover(model_name);
+	get(model_def, query) {
+		let Model = _.isString(model_def) ? discover(model_def) : model_def;
+
 		let is_colletction = this.isCollection(Model, query);
 
 		return this.processQuery(Model, query)
@@ -57,6 +58,10 @@ class Patchwerk {
 		}
 	}
 	composeDescription(Model, params) {
+		//@NOTE: temp decision for explicitly specified key
+		//@TODO: build query from keys
+		if (params.key) return [_.castArray(key)];
+
 		let description = Model.description();
 		let chain = this.resolveParents(Model, [Model]);
 		let keys = _.map(chain, i => i.description().key);
