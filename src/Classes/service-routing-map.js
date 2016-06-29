@@ -20,7 +20,11 @@ class ServiceRoutingMap extends BasicDocument {
 	}
 	_getLinkedEntries(root, service_id) {
 		let rules = _.filter(_.get(this, ["routes", root]), (item) => ~_.castArray(item.from).indexOf(service_id));
-		let services = _.chain(rules).map("to").flatten().uniq().value();
+		let services = _.chain(rules)
+			.map("to")
+			.flatten()
+			.uniq()
+			.value();
 
 		return ~services.indexOf("*") ? "*" : services;
 	}

@@ -16,16 +16,12 @@ db.init({
 	"default_bucket": "rdf"
 });
 
-queue.listenTask('database.get', function (id) {
-	return db.get({
-		args: arguments
-	});
+queue.listenTask('database.get', function (params) {
+	return db.get(params);
 });
 
-queue.listenTask('database.getMulti', function (ids) {
-	return db.getMulti({
-		args: arguments
-	});
+queue.listenTask('database.getMulti', function (params) {
+	return db.getMulti(params);
 });
 
 
@@ -40,7 +36,7 @@ describe('Fresh data!', () => {
 			department: "department-1",
 			counter: 1
 		}).then(d => {
-			console.log(d);
+			console.log(d.id);
 		})
 	});
 	it('Collection', () => {
