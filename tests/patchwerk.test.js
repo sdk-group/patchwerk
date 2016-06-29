@@ -57,6 +57,15 @@ describe('Fresh data!', () => {
 			console.log(d.length)
 		})
 	});
+	it('Ticket', () => {
+		p.get('Ticket', {
+			department: "department-1",
+			counter: '1',
+			date: '2016-06-20'
+		}).then(d => {
+			console.log(d.org_destination)
+		})
+	});
 
 	it('ServiceRoutingMap', () => {
 		p.get('ServiceRoutingMap', {
