@@ -20,7 +20,9 @@ class Patchwerk {
 			.then(keyset => {
 				let uniq_subset = _.uniq(_.flatten(keyset));
 
-				return this.emitter.addTask('database.getMulti', uniq_subset)
+				return this.emitter.addTask('database.getMulti', {
+						args: [uniq_subset]
+					})
 					.then((data) => {
 						let composed = _.map(keyset, keys => {
 							let datachain = _.map(keys, key => data[key]);
