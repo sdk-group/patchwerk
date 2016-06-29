@@ -59,11 +59,9 @@ describe('Fresh data!', () => {
 	});
 	it('Ticket', () => {
 		p.get('Ticket', {
-			department: "department-1",
-			counter: '1',
-			date: '2016-06-20'
+			key: "ticket-department-1-2016-06-20--1"
 		}).then(d => {
-			console.log(d.org_destination)
+			console.log(d)
 		})
 	});
 
