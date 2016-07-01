@@ -60,7 +60,9 @@ class Patchwerk {
   composeDescription(Model, params) {
     //@NOTE: temp decision for explicitly specified key
     //@TODO: build query from keys
-    if (_.head(params).key) return [_.castArray(_.head(params).key)];
+    //
+    let first = _.head(params);
+    if (first && first.key) return [_.castArray(first.key)];
 
     let description = Model.description();
     let chain = this.resolveParents(Model, [Model]);
