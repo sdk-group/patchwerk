@@ -9,11 +9,13 @@ class WorkstationCounter extends AtomicCounter {
     }
   }
   range(query) {
+    let available_workstations = _.get(this.value, ['content', 'control-panel']);
+
     if (query && query.state == 'active') {
-      return _.filter(_.get(this.value, ['content', 'control-panel']), ['active', true]);
+      available_workstations = _.filter(available_workstations, ['active', true]);
     }
 
-    return _.map(_.get(this.value, ['content', 'control-panel']), 'id');
+    return _.map(available_workstations, 'id');
   }
 }
 
