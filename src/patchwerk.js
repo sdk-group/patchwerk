@@ -18,7 +18,8 @@ class Patchwerk {
 	}
 	get(model_def, query, options) {
 		let Model = this.getModel(model_def);
-		let Composer = this.composeDescription.bind(this, Model);
+		let ModelChain = resolveParents(Model);
+		let Composer = this.composeDescription.bind(this, ModelChain);
 
 		return this.processQuery(Model, query)
 			.then(Composer)
@@ -57,7 +58,7 @@ class Patchwerk {
 				.then(range => _.map(range, index => _.set(_.clone(query), 'counter', index)));
 		}
 	}
-	composeDescription(Model, params) {
+	composeDescription(chain, params) {
 		//@NOTE: temp decision for explicitly specified key
 		//@TODO: build query from keys
 		//
@@ -65,7 +66,7 @@ class Patchwerk {
 		if (first && first.key) return [_.castArray(first.key)];
 
 		let description = Model.description();
-		let chain = resolveParents(Model);
+
 		let keys = _.map(chain, i => Templatizer(i.description().key, params));
 
 		return keys;
