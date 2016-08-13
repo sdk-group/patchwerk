@@ -3,6 +3,10 @@
 let _ = require('lodash');
 
 class BasicDocument {
+	static isCollection(query) {
+		let counter = query.counter;
+		return query.counter == '*' || _.isArray(query.counter);
+	}
 	constructor(id, datachain) {
 		this.id = id;
 		this.owners = {};

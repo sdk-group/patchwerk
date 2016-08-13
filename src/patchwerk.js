@@ -1,91 +1,75 @@
 'use strict'
 
-let _ = require('lodash');
+const _ = require('lodash');
+const Templatizer = require('./utils/templatizer.js');
+const resolveParents = require('./utils/parents.js').resolveParents;
 
-let discover = function(model_name) {
-  let name = _.kebabCase(model_name);
-  return require(`./Classes/${name}.js`)
+let discover = function (model_name) {
+	let name = _.kebabCase(model_name);
+	return require(`./Classes/${name}.js`)
 }
 
 class Patchwerk {
-  constructor(emitter) {
-    this.emitter = emitter;
-  }
-  get(model_def, query) {
-    let Model = _.isString(model_def) ? discover(model_def) : model_def;
+	constructor(emitter) {
+		this.emitter = emitter;
+	}
+	getModel(definition) {
+		return _.isString(definition) ? discover(definition) : definition
+	}
+	get(model_def, query, options) {
+		let Model = this.getModel(model_def);
+		let Composer = this.composeDescription.bind(this, Model);
 
-    let is_colletction = this.isCollection(Model, query);
+		return this.processQuery(Model, query)
+			.then(Composer)
+			.then(keyset => {
+				let uniq_subset = _.uniq(_.flatten(keyset));
+				return this.emitter.addTask('database.getMulti', {
+						args: [uniq_subset]
+					})
+					.then((data) => {
+						let composed = _.map(keyset, keys => {
+							let datachain = _.map(keys, key => data[key]);
+							let id = _.head(keys);
 
-    return this.processQuery(Model, query)
-      .then(params => this.composeDescription(Model, params))
-      .then(keyset => {
-        let uniq_subset = _.uniq(_.flatten(keyset));
+							return new Model(id, datachain);
+						});
 
-        return this.emitter.addTask('database.getMulti', {
-            args: [uniq_subset]
-          })
-          .then((data) => {
-            let composed = _.map(keyset, keys => {
-              let datachain = _.map(keys, key => data[key]);
-              let id = _.head(keys);
+						return Model.isCollection(query) ? composed : _.head(composed);
+					});
+			});
+	}
 
-              return new Model(id, datachain);
-            });
+	processQuery(Model, query) {
+		let is_colletction = Model.isCollection(query);
 
-            return is_colletction ? composed : _.head(composed);
-          });
-      });
-  }
-  isCollection(Model, query) {
-    //@NOTE: temp
-    let counter = query.counter;
+		if (!is_colletction) return Promise.resolve([query])
 
-    return query.counter == '*' || _.isArray(query.counter);
-  }
-  processQuery(Model, query) {
-    let is_colletction = this.isCollection(Model, query);
+		if (query.counter == '*') {
+			let counterquery = _.cloneDeep(query);
+			_.unset(counterquery, 'counter');
 
-    if (!is_colletction) return Promise.resolve([query])
+			let description = Model.description();
+			let counter_name = description.counter;
 
-    if (query.counter == '*') {
-      let counterquery = _.cloneDeep(query);
-      _.unset(counterquery, 'counter');
-      let counter_name = Model.description().counter;
+			return this.get(counter_name, counterquery)
+				.then(counter => counter.range(counterquery))
+				.then(range => _.map(range, index => _.set(_.clone(query), 'counter', index)));
+		}
+	}
+	composeDescription(Model, params) {
+		//@NOTE: temp decision for explicitly specified key
+		//@TODO: build query from keys
+		//
+		let first = _.head(params);
+		if (first && first.key) return [_.castArray(first.key)];
 
-      return this.get(counter_name, counterquery)
-        .then(counter => counter.range(counterquery))
-        .then(range => _.map(range, index => _.set(_.clone(query), 'counter', index)));
-    }
-  }
-  composeDescription(Model, params) {
-    //@NOTE: temp decision for explicitly specified key
-    //@TODO: build query from keys
-    //
-    let first = _.head(params);
-    if (first && first.key) return [_.castArray(first.key)];
+		let description = Model.description();
+		let chain = resolveParents(Model);
+		let keys = _.map(chain, i => Templatizer(i.description().key, params));
 
-    let description = Model.description();
-    let chain = this.resolveParents(Model, [Model]);
-    let keys = _.map(chain, i => i.description().key);
-
-    return this.templatize(keys, params);
-  }
-  templatize(key_templates, values) {
-    return _.map(values, value => _.map(key_templates, base => this.applyTemplate(base, value)));
-  }
-  applyTemplate(template_string, params) {
-    return _.reduce(params, (template, value, param) => template.replace('{' + param + '}', value), template_string);
-  }
-  resolveParents(Model, acc) {
-    let parent = Object.getPrototypeOf(Model) || {};
-
-    if (_.isFunction(parent.description)) {
-      acc.push(parent);
-      this.resolveParents(parent, acc);
-    }
-
-    return acc;
-  }
+		return keys;
+	}
 }
 
 
