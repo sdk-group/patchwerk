@@ -32,12 +32,17 @@ class MetaModel {
     });
 
   }
+  compose(query, options) {
+
+  }
   processDependencies(query) {
     const getter = "Magic getter";
 
     return Promise.mapSeries(this.dependencies, dep => {
       let model = dep.item;
-      let keys = model.getKeys(query, options);
+      model.getKeys(query, options).then(
+
+      )
       return getter(keys).then(data => this.resolveDependency(item, data, query))
     })
   }
