@@ -86,13 +86,12 @@ describe.only('some tests', () => {
 				}
 			}
 		})
-		it('cursorArrayTyped', () => {
-			for (var x = 0; x < counter; x++) {
+		it('cursorArrayTyped x 10', () => {
+			for (var x = 0; x < counter * 10; x++) {
 				cursor = [new Cursor('q1', 3), new Cursor('q2', 3), new Cursor('q3', 3)];
 
 				for (var i = 0; i < 18; i++) {
 					let status = iterator.incCursorArrayTyped(cursor);
-
 				}
 			}
 		})
