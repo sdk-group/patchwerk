@@ -20,7 +20,6 @@ class QueryIterator {
 		return cursors;
 	}
 	incCursorArray(cursors) {
-		let cursor_name;
 		let len = cursors.length;
 		for (let i = 0; i < len; i++) {
 			let cursor = cursors[i];
@@ -30,6 +29,16 @@ class QueryIterator {
 			} else if (cursor.pos + 1 == cursor.max) {
 				cursor.pos = 0;
 			}
+		}
+
+		return false;
+	}
+	incCursorArrayTyped(cursors) {
+		let len = cursors.length;
+		for (let i = 0; i < len; i++) {
+			let cursor = cursors[i];
+			if (cursor.inc()) return true;
+			cursor.reset();
 		}
 
 		return false;

@@ -1,6 +1,23 @@
 'use strict'
 
 let QueryIterator = require('./query-iterator.js');
+
+class Cursor {
+	constructor(name, max) {
+		this.pos = 0;
+		this.name = name;
+		this.max = max;
+	}
+	reset() {
+		this.pos = 0;
+	}
+	inc() {
+		if (this.pos + 1 == this.max) return false;
+		this.pos++;
+		return true
+	}
+}
+
 let makeCursor = function(l) {
 	let acc = {};
 	l = l || '';
@@ -66,6 +83,16 @@ describe.only('some tests', () => {
 
 				for (var i = 0; i < 18; i++) {
 					let status = iterator.incCursorArray(cursor);
+				}
+			}
+		})
+		it('cursorArrayTyped', () => {
+			for (var x = 0; x < counter; x++) {
+				cursor = [new Cursor('q1', 3), new Cursor('q2', 3), new Cursor('q3', 3)];
+
+				for (var i = 0; i < 18; i++) {
+					let status = iterator.incCursorArrayTyped(cursor);
+
 				}
 			}
 		})
