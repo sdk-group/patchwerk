@@ -9,67 +9,40 @@ let discover = function(model_name) {
   let name = _.kebabCase(model_name);
   return require(`./classes/${name}.js`)
 }
-
 class MetaModel {
-  constructor(model_name) {
+  constructor(model_name, emitter) {
     this.Model = discover(model_name);
     this.dependencies = [];
+    this.emitter = emitter;
   }
   getKeys(query, options) {
     let templates = this.getTemplates(options);
-    this.processQuery(query, templates, options);
+    let is_colletction = this.Model.isCollection(query);
 
-    return this.processDependencies(query, options).then(() => {
-      let iterator = this.makeIterator(query, options);
+    return is_colletction ? this._collectionKeys(query, templates) : this._singleObjectKeys(query, templates);
+  }
+  _collectionKeys(iterator, templates) {
+    let keys = new Set();
 
-      let keys = _.transform(templates, (acc, template) => {
-        for (let params of iterator) {
-          acc.push(Templatizer(template, params));
-        }
-      }, acc);
-
-      return keys;
+    _.forEach(templates, template => {
+      for (let params of iterator) {
+        keys.add(Templatizer(template, params));
+      }
     });
 
+    return keys;
+  }
+  _singleObjectKeys(params, templates) {
+    let keys = new Set();
+    _.forEach(templates, template => keys.add(Templatizer(template, params)));
+    return keys;
   }
   compose(query, options) {
+    let keyset = this.getKeys(query, options);
+    let keys = [...keyset];
+    let Model = this.Model;
 
-  }
-  processDependencies(query) {
-    const getter = "Magic getter";
-
-    return Promise.mapSeries(this.dependencies, dep => {
-      let model = dep.item;
-      model.getKeys(query, options).then(
-
-      )
-      return getter(keys).then(data => this.resolveDependency(item, data, query))
-    })
-  }
-  resolveDependency(item, data, query) {
-    if (item.type == 'counter') {
-      query.counter = data;
-    }
-    return true;
-  }
-  processQuery(query, templates, options) {
-    this.processCounters(query, templates);
-    //this.processExternalFeilds(query, templates);
-    //this.processLinks(query, templates);
-
-    return Promise.resolve(query);
-  }
-  processCounters(query, templates) {
-    if (query.counter == '*') {
-      //@NOTE: get top level counter
-      let counter_name = _.find(templates, template => !!template.counter);
-      let counter = new MetaModel(counter_name);
-
-      this.dependencies.push({
-        item: counter,
-        type: 'counter'
-      });
-    }
+    return this.getSoruceData(keys).then(source_hash_map => new Model(source_hash_map));
   }
   getTemplates(options) {
     let model_chain = this.resolveParents();
@@ -98,8 +71,11 @@ class MetaModel {
 
     return acc;
   }
+  getSoruceData(keys) {
+    return this.emitter.addTask('database.getMulti', {
+      args: [keys]
+    })
+  }
 }
 
 module.exports = MetaModel;
-dule.exports = MetaModel;
-orts = MetaModel;
