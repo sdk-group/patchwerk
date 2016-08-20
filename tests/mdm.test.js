@@ -48,6 +48,27 @@ describe.only('some tests', () => {
 				}
 			}
 		})
+		it('cursorArray', () => {
+			for (var x = 0; x < counter; x++) {
+				cursor = [{
+					pos: 0,
+					max: 3,
+					name: 'qq1'
+				}, {
+					pos: 0,
+					max: 3,
+					name: 'qq2'
+				}, {
+					pos: 0,
+					max: 3,
+					name: 'qq3'
+				}];
+
+				for (var i = 0; i < 18; i++) {
+					let status = iterator.incCursorArray(cursor);
+				}
+			}
+		})
 		it('cursorMap', () => {
 			for (var x = 0; x < counter; x++) {
 				cursor = new Map();

@@ -3,74 +3,89 @@
 const _ = require('lodash');
 
 class QueryIterator {
-  constructor(query) {
-    this.query = query;
-  }
-  initCursors() {
-    let cursors = {};
+	constructor(query) {
+		this.query = query;
+	}
+	initCursors() {
+		let cursors = {};
 
-    _.forEach(this.query, (entry, name) => {
-      let max = _.isArray(entry) ? entry.length : -1;
-      cursors[name] = {
-        pos: 0,
-        max: max
-      };
-    });
+		_.forEach(this.query, (entry, name) => {
+			let max = _.isArray(entry) ? entry.length : -1;
+			cursors[name] = {
+				pos: 0,
+				max: max
+			};
+		});
 
-    return cursors;
-  }
-  incCursorLodash(cursors) {
-    let done = false;
-    _.forEach(cursors, cursor => {
-      if (cursor.pos + 1 < cursor.max) {
-        cursor.pos++;
-        done = true;
-        return false;
-      } else if (cursor.pos + 1 == cursor.max) {
-        cursor.pos = 0;
-      }
-    })
+		return cursors;
+	}
+	incCursorArray(cursors) {
+		let cursor_name;
+		let len = cursors.length;
+		for (let i = 0; i < len; i++) {
+			let cursor = cursors[i];
+			if (cursor.pos + 1 < cursor.max) {
+				cursor.pos++;
+				return true;
+			} else if (cursor.pos + 1 == cursor.max) {
+				cursor.pos = 0;
+			}
+		}
 
-    return done;
-  }
-  incCursor(cursors) {
-    let cursor_name;
-    for (cursor_name in cursors) {
-      let cursor = cursors[cursor_name];
-      if (cursor.pos + 1 < cursor.max) {
-        cursor.pos++;
-        return true;
-      } else if (cursor.pos + 1 == cursor.max) {
-        cursor.pos = 0;
-      }
-    }
+		return false;
+	}
+	incCursorLodash(cursors) {
+		let done = false;
+		_.forEach(cursors, cursor => {
+			if (cursor.pos + 1 < cursor.max) {
+				cursor.pos++;
+				done = true;
+				return false;
+			} else if (cursor.pos + 1 == cursor.max) {
+				cursor.pos = 0;
+			}
+		})
 
-    return false;
-  }
-  incCursorMap(cursors) {
-    let cursor;
-    for (cursor in cursors.values()) {
-      if (cursor.pos + 1 < cursor.max) {
-        cursor.pos++;
-        return true;
-      } else if (cursor.pos + 1 == cursor.max) {
-        cursor.pos = 0;
-      }
-    }
+		return done;
+	}
+	incCursor(cursors) {
+		let cursor_name;
+		for (cursor_name in cursors) {
+			let cursor = cursors[cursor_name];
+			if (cursor.pos + 1 < cursor.max) {
+				cursor.pos++;
+				return true;
+			} else if (cursor.pos + 1 == cursor.max) {
+				cursor.pos = 0;
+			}
+		}
 
-    return false;
-  }
+		return false;
+	}
+	incCursorMap(cursors) {
+		let cursor;
+		for (cursor in cursors.values()) {
+			if (cursor.pos + 1 < cursor.max) {
+				cursor.pos++;
+				return true;
+			} else if (cursor.pos + 1 == cursor.max) {
+				cursor.pos = 0;
+			}
+		}
 
-  [Symbol.iterator]() {
-    let _this = this;
-    let cursors = this.initCursors();
+		return false;
+	}
 
-    return {
-      next: function() {
+	[Symbol.iterator]() {
+		let _this = this;
+		let cursors = this.initCursors();
 
-      }
-    }
-  }
+		return {
+			next: function() {
+
+			}
+		}
+	}
 
 }
 
