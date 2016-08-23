@@ -1,10 +1,12 @@
 'use strict'
 
-let _ = require('lodash');
+const _ = require('lodash');
 
-class AtomicCounter {
+const BasicDocument = require('./basic.js');
+
+class AtomicCounter extends BasicDocument {
 	constructor(id, datachain) {
-		this.id = id;
+		super(id, datachain);
 		this.value = datachain[0].value;
 	}
 	range() {

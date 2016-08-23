@@ -7,7 +7,6 @@ const Cursor = require('./cursor.js');
 class QueryIterator {
 	constructor(query) {
 		this.query = query;
-		this.cursors = this.initCursors();
 	}
 	initCursors() {
 		let cursors = [];
@@ -19,8 +18,7 @@ class QueryIterator {
 
 		return cursors;
 	}
-	incCursor() {
-		let cursors = this.cursors;
+	incCursor(cursors) {
 		let len = cursors.length;
 		let i;
 
@@ -33,23 +31,32 @@ class QueryIterator {
 		return false;
 	}
 
-	*
 	[Symbol.iterator]() {
 		let _this = this;
 		let cursors = this.initCursors();
-		let flag = true;
-		while (flag) {
-			let len = cursors.length;
-			let acc = {};
+		let flag = -1;
+		return {
+			next: function () {
+				flag = (flag === -1) ? true : _this.incCursor(cursors);
+				let len = cursors.length;
+				let acc = Array(len);
 
-			while (len--) {
-				let cursor = cursors[len];
-				acc[cursor.name] = cursor.value();
+				while (len--) {
+					let cursor = cursors[len];
+					acc[len] = {
+						name: cursor.name,
+						value: cursor.value()
+					};
+				}
+
+
+				return {
+					value: acc,
+					done: !flag
+				};
 			}
-			yield acc;
-
-			flag = this.incCursor(cursors);
 		}
+
 	}
 
 }

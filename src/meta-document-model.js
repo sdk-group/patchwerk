@@ -5,77 +5,116 @@ const Promise = require('bluebird');
 
 const Templatizer = require('./utils/templatizer.js');
 
-let discover = function(model_name) {
-  let name = _.kebabCase(model_name);
-  return require(`./classes/${name}.js`)
+let discover = function (model_name) {
+	let name = _.kebabCase(model_name);
+	return require(`./classes/${name}.js`)
 }
+
+let isIterable = function (obj) {
+	if (!obj) {
+		return false;
+	}
+	return typeof obj[Symbol.iterator] === 'function';
+}
+
 class MetaModel {
-  constructor(model_name, emitter) {
-    this.Model = discover(model_name);
-    this.dependencies = [];
-    this.emitter = emitter;
-  }
-  getKeys(query, options) {
-    let templates = this.getTemplates(options);
-    let is_colletction = this.Model.isCollection(query);
+	constructor(model_def) {
+		this.Model = this.getModel(model_def);
+		this.ModelChain = this.resolveParents();
+	}
+	getModel(definition) {
+		return _.isString(definition) ? discover(definition) : definition
+	}
+	isCollection(query) {
+		let has_counter = this.getCounter();
 
-    return is_colletction ? this._collectionKeys(query, templates) : this._singleObjectKeys(query, templates);
-  }
-  _collectionKeys(iterator, templates) {
-    let keys = new Set();
+		if (!has_counter) return false;
 
-    _.forEach(templates, template => {
-      for (let params of iterator) {
-        keys.add(Templatizer(template, params));
-      }
-    });
+		if (query.counter == '*' || _.isArray(query.counter)) return true;
 
-    return keys;
-  }
-  _singleObjectKeys(params, templates) {
-    let keys = new Set();
-    _.forEach(templates, template => keys.add(Templatizer(template, params)));
-    return keys;
-  }
-  compose(query, options) {
-    let keyset = this.getKeys(query, options);
-    let keys = [...keyset];
-    let Model = this.Model;
+		for (let name in query) {
+			if (_.isArray(query[name])) return true;
+		}
 
-    return this.getSoruceData(keys).then(source_hash_map => new Model(source_hash_map));
-  }
-  getTemplates(options) {
-    let model_chain = this.resolveParents();
-    //@TODO: resolve links based on model, add them to template list
-    return _.transform(model_chain, (acc, item) => {
-      let desc = item.description();
-      if (!_.find(acc, ['key', desc.key])) acc.push(desc);
-    }, []);
-  }
-  resolveParents() {
-    let model = this.Model;
-    let acc = [model];
-    let current = model;
-    let parent = Object.getPrototypeOf(current) || false;
+		return false;
+	}
+	getKeys(query, options) {
+		let templates = this.getTemplates(options);
 
-    while (parent) {
-      if (_.isFunction(parent.description)) {
-        acc.push(parent);
-        current = parent;
-        let parent = Object.getPrototypeOf(current) || false;
-        continue;
-      }
+		return isIterable(query) ? this._collectionKeys(query, templates) : this._singleObjectKeys(query, templates);
+	}
+	_collectionKeys(iterator, templates) {
+		let keys = new Set();
+		let len = templates.length;
 
-      parent = false;
-    }
+		let i, params, template;
 
-    return acc;
-  }
-  getSoruceData(keys) {
-    return this.emitter.addTask('database.getMulti', {
-      args: [keys]
-    })
-  }
+		for (params of iterator) {
+			for (i = 0; i < len; i++) {
+				template = templates[i];
+				keys.add(Templatizer(template, params));
+			}
+		}
+
+		return keys;
+	}
+	_singleObjectKeys(params, templates) {
+		let keys = new Set();
+		let len = templates.length;
+
+		while (len--) {
+			template = templates[len];
+			keys.add(Templatizer(template, params));
+		}
+
+		return keys;
+	}
+	build(data, options) {
+
+	}
+	getTemplates(options) {
+		let model_chain = this.ModelChain;
+		//@TODO: resolve links based on model, add them to template list
+		return _.transform(model_chain, (acc, item) => {
+			let desc = item.description();
+			if (!_.find(acc, ['key', desc.key])) acc.push(desc);
+		}, []);
+	}
+	resolveParents() {
+		let model = this.Model;
+		let acc = [model];
+		let current = model;
+		let parent = Object.getPrototypeOf(current) || false;
+
+		while (parent) {
+			if (_.isFunction(parent.description)) {
+				acc.push(parent);
+				current = parent;
+				let parent = Object.getPrototypeOf(current) || false;
+				continue;
+			}
+
+			parent = false;
+		}
+
+		return acc;
+	}
+	getCounter() {
+		let counter = false;
+
+		let i, len = this.ModelChain.length;
+
+		for (i = 0; i < len; i++) {
+			let desc = this.ModelChain[i].description();
+
+			if (desc && desc.counter) {
+				counter = desc.counter;
+				break;
+			}
+		}
+
+		return counter;
+	}
 }
 
 module.exports = MetaModel;
