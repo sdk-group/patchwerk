@@ -2,41 +2,28 @@
 
 const _ = require('lodash');
 
+const Cursor = require('./cursor.js');
+
 class QueryIterator {
 	constructor(query) {
 		this.query = query;
+		this.cursors = this.initCursors();
 	}
 	initCursors() {
-		let cursors = {};
-
-		_.forEach(this.query, (entry, name) => {
-			let max = _.isArray(entry) ? entry.length : -1;
-			cursors[name] = {
-				pos: 0,
-				max: max
-			};
-		});
+		let cursors = [];
+		let name;
+		for (name in this.query) {
+			let entry = this.query[name];
+			cursors.push(new Cursor(name, entry));
+		}
 
 		return cursors;
 	}
-	incCursorArray(cursors) {
+	incCursor() {
+		let cursors = this.cursors;
 		let len = cursors.length;
 		let i;
-		for (i = 0; i < len; i++) {
-			let cursor = cursors[i];
-			if (cursor.pos + 1 < cursor.max) {
-				cursor.pos++;
-				return true;
-			} else if (cursor.pos + 1 == cursor.max) {
-				cursor.pos = 0;
-			}
-		}
 
-		return false;
-	}
-	incCursorArrayTyped(cursors) {
-		let len = cursors.length;
-		let i;
 		for (i = 0; i < len; i++) {
 			let cursor = cursors[i];
 			if (cursor.inc()) return true;
@@ -45,56 +32,23 @@ class QueryIterator {
 
 		return false;
 	}
-	incCursorLodash(cursors) {
-		let done = false;
-		_.forEach(cursors, cursor => {
-			if (cursor.pos + 1 < cursor.max) {
-				cursor.pos++;
-				done = true;
-				return false;
-			} else if (cursor.pos + 1 == cursor.max) {
-				cursor.pos = 0;
-			}
-		})
 
-		return done;
-	}
-	incCursor(cursors) {
-		let cursor_name;
-		for (cursor_name in cursors) {
-			let cursor = cursors[cursor_name];
-			if (cursor.pos + 1 < cursor.max) {
-				cursor.pos++;
-				return true;
-			} else if (cursor.pos + 1 == cursor.max) {
-				cursor.pos = 0;
-			}
-		}
-
-		return false;
-	}
-	incCursorMap(cursors) {
-		let cursor;
-		for (cursor in cursors.values()) {
-			if (cursor.pos + 1 < cursor.max) {
-				cursor.pos++;
-				return true;
-			} else if (cursor.pos + 1 == cursor.max) {
-				cursor.pos = 0;
-			}
-		}
-
-		return false;
-	}
-
+	*
 	[Symbol.iterator]() {
 		let _this = this;
 		let cursors = this.initCursors();
+		let flag = true;
+		while (flag) {
+			let len = cursors.length;
+			let acc = {};
 
-		return {
-			next: function() {
-
+			while (len--) {
+				let cursor = cursors[len];
+				acc[cursor.name] = cursor.value();
 			}
+			yield acc;
+
+			flag = this.incCursor(cursors);
 		}
 	}
 
