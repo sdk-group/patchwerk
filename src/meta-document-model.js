@@ -14,13 +14,26 @@ let isIterable = function (obj) {
 	if (!obj) {
 		return false;
 	}
-	return typeof obj[Symbol.iterator] === 'function';
+	return !!obj[Symbol.iterator];
 }
 
 class MetaModel {
-	constructor(model_def) {
+	constructor(model_def, options) {
+		this.options = options;
 		this.Model = this.getModel(model_def);
 		this.ModelChain = this.resolveParents();
+		this.descriptions = this.getDescriptions();
+	}
+	getDescriptions() {
+		let len = this.ModelChain.length;
+		let desc = Array(len);
+
+		while (len--) {
+			let item = this.ModelChain[len];
+			desc[len] = item.description();
+		}
+
+		return desc;
 	}
 	getModel(definition) {
 		return _.isString(definition) ? discover(definition) : definition
@@ -30,26 +43,31 @@ class MetaModel {
 
 		if (!has_counter) return false;
 
-		if (query.counter == '*' || _.isArray(query.counter)) return true;
+		if (query.counter == '*' || query.counter.constructor === Array) return true;
 
 		for (let name in query) {
-			if (_.isArray(query[name])) return true;
+			if (query[name].counter.constructor === Array) return true;
 		}
 
 		return false;
 	}
-	getKeys(query, options) {
-		let templates = this.getTemplates(options);
+	getKeys(query) {
+		let templates = this.getTemplates();
 
 		return isIterable(query) ? this._collectionKeys(query, templates) : this._singleObjectKeys(query, templates);
 	}
 	_collectionKeys(iterator, templates) {
+		let object_count = iterator.length();
+		let object_counter = 0;
+		this.object = Array(object_count);
+
 		let keys = new Set();
 		let len = templates.length;
-
 		let i, params, template;
 
 		for (params of iterator) {
+			this.objects[object_counter++] = this.makeModel(params);
+
 			for (i = 0; i < len; i++) {
 				template = templates[i];
 				keys.add(Templatizer(template, params));
@@ -58,9 +76,24 @@ class MetaModel {
 
 		return keys;
 	}
+	makeModel(params) {
+		let Model = this.Model;
+
+		let len = this.descriptions.length;
+		let ids = Array(len);
+
+		while (len--) {
+			let item = this.descriptions[len];
+			ids[len] = Templatizer(item.key, params);
+		}
+
+		return new Model(ids);
+	}
 	_singleObjectKeys(params, templates) {
 		let keys = new Set();
 		let len = templates.length;
+
+		this.object = this.makeModel(params);
 
 		while (len--) {
 			template = templates[len];
@@ -69,14 +102,23 @@ class MetaModel {
 
 		return keys;
 	}
-	build(data, options) {
+	build(data) {
+		let is_colletction = this.objects.constructor === Array;
+		let builder = is_colletction ? this._buildCollection : this._buildSingle;
+		return builder(data);
+	}
+	_buildCollection(data) {
+		let Model = this.Model();
 
 	}
-	getTemplates(options) {
+	_buildSingle(data) {
+		let Model = this.Model();
+
+	}
+	getTemplates() {
 		let model_chain = this.ModelChain;
 		//@TODO: resolve links based on model, add them to template list
-		return _.transform(model_chain, (acc, item) => {
-			let desc = item.description();
+		return _.transform(this.descriptions, (acc, desc) => {
 			if (!_.find(acc, ['key', desc.key])) acc.push(desc);
 		}, []);
 	}

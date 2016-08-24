@@ -3,10 +3,11 @@
 let _ = require('lodash');
 
 class BasicDocument {
-	constructor(id, datachain) {
-		this.id = id;
+	constructor(ids, datachain) {
+		this.id = ids[0];
+		this.ids = ids;
 		this.owners = {};
-		this.processDatachain(datachain);
+		if (datachain) this.processDatachain(datachain);
 	}
 	processDatachain(datachain) {
 		let composed = _.transform(datachain, (result, item) => {

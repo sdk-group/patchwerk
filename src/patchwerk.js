@@ -17,12 +17,12 @@ class Patchwerk {
 		this.emitter = emitter;
 	}
 	get(model_def, query, options) {
-		let metaDocument = new MetaDocument(model_def);
+		let metaDocument = new MetaDocument(model_def, options);
 
 		return this.processQuery(metaDocument, query)
-			.then(query_params => metaDocument.getKeys(query_params, options))
+			.then(query_params => metaDocument.getKeys(query_params))
 			.then(uniq_subset => this.getSoruceData(uniq_subset))
-			.then(data => metaDocument.build(data, options));
+			.then(data => metaDocument.build(data, query_params));
 	}
 	processQuery(Model, query) {
 		let is_colletction = Model.isCollection(query);
