@@ -8,6 +8,20 @@ class QueryIterator {
 	constructor(query) {
 		this.query = query;
 	}
+	length() {
+		let len = cursors.length;
+		let result = 1;
+		let i;
+
+		for (i = 0; i < len; i++) {
+			let cursor = cursors[i];
+			let max = cursor.max
+			if (max) result *= max;
+
+		}
+
+		return result;
+	}
 	initCursors() {
 		let cursors = [];
 		let name;
