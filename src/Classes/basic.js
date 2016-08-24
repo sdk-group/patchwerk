@@ -9,6 +9,17 @@ class BasicDocument {
 		this.owners = {};
 		if (datachain) this.processDatachain(datachain);
 	}
+	setData(dataset) {
+		let len = this.ids.length;
+		let datachain = Array(len);
+
+		while (len--) {
+			let item = this.ids[len];
+			datachain[len] = dataset[item];
+		}
+
+		this.processDatachain(datachain);
+	}
 	processDatachain(datachain) {
 		let composed = _.transform(datachain, (result, item) => {
 			!!item && _.defaults(result, item.value);
