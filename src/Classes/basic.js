@@ -9,26 +9,34 @@ class BasicDocument {
 		this.owners = {};
 		if (datachain) this.processDatachain(datachain);
 	}
-	setData(dataset) {
+	pickData(dataset) {
 		let len = this.ids.length;
 		let datachain = Array(len);
+		console.log('ids', this.ids);
+
 
 		while (len--) {
 			let item = this.ids[len];
-			datachain[len] = dataset[item];
+			datachain[len] = dataset[item].value;
 		}
 
 		this.processDatachain(datachain);
+		console.log('dataset', datachain);
+
+		return this;
 	}
 	processDatachain(datachain) {
 		let composed = _.transform(datachain, (result, item) => {
 			!!item && _.defaults(result, item.value);
 		}, {});
 
-		_.forEach(composed, (value, key) => {
+		let key, value;
+
+		for (key in composed) {
+			value = composed[key];
 			this[key] = value;
 			this.owners[key] = this._ownerOf(key, datachain);
-		})
+		}
 	}
 	_ownerOf(param_name, datachain) {
 		let owner = false;

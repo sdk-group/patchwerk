@@ -3,7 +3,7 @@
 let QueryIterator = require('./query-iterator.js');
 
 
-describe.only('some tests', () => {
+describe('some tests', () => {
 	let iterator;
 	let cursor;
 	let counter = 100000;

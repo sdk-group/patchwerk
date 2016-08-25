@@ -5,12 +5,12 @@ const Promise = require('bluebird');
 
 const Templatizer = require('./utils/templatizer.js');
 
-let discover = function (model_name) {
+let discover = function(model_name) {
 	let name = _.kebabCase(model_name);
 	return require(`./classes/${name}.js`)
 }
 
-let isIterable = function (obj) {
+let isIterable = function(obj) {
 	if (!obj) {
 		return false;
 	}
@@ -43,10 +43,10 @@ class MetaModel {
 
 		if (!has_counter) return false;
 
-		if (query.counter == '*' || query.counter.constructor === Array) return true;
+		if (query.counter && (query.counter == '*' || query.counter.constructor === Array)) return true;
 
 		for (let name in query) {
-			if (query[name].counter.constructor === Array) return true;
+			if (query[name].counter && query[name].counter.constructor === Array) return true;
 		}
 
 		return false;
@@ -66,7 +66,7 @@ class MetaModel {
 		let i, params, template;
 
 		for (params of iterator) {
-			this.objects[object_counter++] = this.makeModel(params);
+			this.object[object_counter++] = this.makeModel(params);
 
 			for (i = 0; i < len; i++) {
 				template = templates[i];
@@ -74,16 +74,16 @@ class MetaModel {
 			}
 		}
 
-		return keys;
+		return [...keys];
 	}
 	makeModel(params) {
 		let Model = this.Model;
 
-		let len = this.descriptions.length;
+		let item, len = this.descriptions.length;
 		let ids = Array(len);
 
 		while (len--) {
-			let item = this.descriptions[len];
+			item = this.descriptions[len];
 			ids[len] = Templatizer(item.key, params);
 		}
 
@@ -92,27 +92,35 @@ class MetaModel {
 	_singleObjectKeys(params, templates) {
 		let keys = new Set();
 		let len = templates.length;
+		let template;
 
 		this.object = this.makeModel(params);
 
 		while (len--) {
 			template = templates[len];
-			keys.add(Templatizer(template, params));
+			keys.add(Templatizer(template.key, params));
 		}
 
-		return keys;
+		return [...keys];
 	}
 	build(data) {
-		let is_colletction = this.objects.constructor === Array;
-		let builder = is_colletction ? this._buildCollection : this._buildSingle;
-		return builder(data);
-	}
-	_buildCollection(data) {
-		let Model = this.Model();
 
+		let is_colletction = this.object.constructor === Array;
+		return is_colletction ? this._buildCollection(data) : this._buildSingle(data);
 	}
 	_buildSingle(data) {
-		let Model = this.Model();
+		return this.object.pickData(data);
+	}
+	_buildCollection(data) {
+		let len = this.object.length;
+		let item;
+
+		while (len--) {
+			item = this.object[len];
+			item.pickData(data)
+		}
+
+		return this.object;
 
 	}
 	getTemplates() {
@@ -132,7 +140,8 @@ class MetaModel {
 			if (_.isFunction(parent.description)) {
 				acc.push(parent);
 				current = parent;
-				let parent = Object.getPrototypeOf(current) || false;
+				parent = Object.getPrototypeOf(current) || false;
+
 				continue;
 			}
 

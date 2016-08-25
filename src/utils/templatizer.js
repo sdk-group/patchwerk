@@ -7,6 +7,7 @@ function ArrayReducer(template, item) {
 };
 
 function ObjectReducer(template, value, param) {
+	console.log(value, param, template);
 	return template.replace('{' + param + '}', value)
 };
 
@@ -15,6 +16,6 @@ function FormTemplateString(template_string, params) {
 	return _.reduce(params, reducer, template_string);
 };
 
-module.exports = function (tempalte, params) {
-	return _.isFunction(tempalte) ? template(params) : FormTemplateString(template, params);
+module.exports = function(template, params) {
+	return _.isFunction(template) ? template(params) : FormTemplateString(template, params);
 }

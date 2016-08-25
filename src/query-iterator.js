@@ -22,7 +22,7 @@ class QueryIterator {
 
 		return result;
 	}
-	initCursors() {
+	init() {
 		let cursors = [];
 		let name;
 		for (name in this.query) {
@@ -47,10 +47,10 @@ class QueryIterator {
 
 	[Symbol.iterator]() {
 		let _this = this;
-		let cursors = this.initCursors();
+		let cursors = this.init();
 		let flag = -1;
 		return {
-			next: function () {
+			next: function() {
 				flag = (flag === -1) ? true : _this.incCursor(cursors);
 				let len = cursors.length;
 				let acc = Array(len);
