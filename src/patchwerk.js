@@ -8,47 +8,83 @@ const QueryIterator = require('./query-iterator.js');
 const MetaDocument = require('./meta-document-model.js');
 
 let discover = function(model_name) {
-	let name = _.kebabCase(model_name);
-	return require(`./classes/${name}.js`)
+  let name = _.kebabCase(model_name);
+  return require(`./classes/${name}.js`)
 }
 
 class Patchwerk {
-	constructor(emitter) {
-		this.emitter = emitter;
-	}
-	get(model_def, query, options) {
-		let metaDocument = new MetaDocument(model_def, options);
+  constructor(emitter) {
+    this.emitter = emitter;
+  }
+  get(model_def, query, options) {
+    let metaDocument = new MetaDocument(model_def, options);
 
-		return this.processQuery(metaDocument, query)
-			.then(query_params => metaDocument.getKeys(query_params))
-			.then(uniq_subset => this.getSoruceData(uniq_subset))
-			.then(data => metaDocument.build(data));
-	}
-	processQuery(Model, query) {
-		let is_colletction = Model.isCollection(query);
-		console.log('is_collection', is_colletction, query);
-		if (!is_colletction) return Promise.resolve(query);
+    return this.processQuery(metaDocument, query)
+      .then(query_params => metaDocument.getKeys(query_params))
+      .then(uniq_subset => this.getSoruceData(uniq_subset))
+      .then(data => metaDocument.build(data));
+  }
+  create(model_def, source, query) {
+    let metaDocument = new MetaDocument(model_def, options);
 
-		return this.processCounter(Model, query).then(counter => {
-			if (counter) query.counter = counter;
+    return this.processCreateQuery(metaDocument, query)
+      .then(query_params => metaDocument.getKeys(query_params))
+      .then(() => {
+        let data = {};
+        data["creation-data"] = source;
+        return metaDocument.build(data);
+      });
+  }
+  save(model) {
+    let is_changed = model.isChanged();
 
-			return new QueryIterator(query);
-		})
-	}
-	processCounter(Model, query) {
-		let counter_name = Model.getCounter();
-		console.log('counter_name', counter_name);
-		return !counter_name ? Promise.resolve(false) : this.get(counter_name, query).then(counter => {
-			console.log('Counter', counter);
-			return counter.range();
-		})
-	}
-	getSoruceData(subset) {
-		console.log('keyset', subset);
-		return this.emitter.addTask('database.getMulti', {
-			args: [subset]
-		})
-	}
+    if (!is_changed) return Promise.resolve(true);
+
+    return this._complete(model)
+      .then(completeModel => completeModel.getSource())
+      .then(sourceData => this.saveSourceData(sourceData))
+      .then(status => status && model.saved());
+  }
+  _complete(model) {
+    let is_complete = model.isComplete();
+
+    if (is_complete) return Promise.resolve(model);
+
+    return
+  }
+  processCreateQuery(query) {
+    //@TODO: check if it's complete object description or not
+    return Promise.resolve(query);
+  }
+  processQuery(Model, query) {
+    let is_colletction = Model.isCollection(query);
+
+    if (!is_colletction) return Promise.resolve(query);
+
+    return this.processCounter(Model, query).then(counter => {
+      if (counter) query.counter = counter;
+
+      return new QueryIterator(query);
+    })
+  }
+  processCounter(Model, query) {
+    let counter_name = Model.getCounter();
+
+    return !counter_name ? Promise.resolve(false) : this.get(counter_name, query).then(counter => {
+      console.log('Counter', counter);
+      return counter.range();
+    })
+  }
+  getSoruceData(subset) {
+    return this.emitter.addTask('database.getMulti', {
+      args: [subset]
+    })
+  }
+  saveSoruceData(datamap) {
+    return this.emitter.addTask('database.upsertMulti', {
+      args: [datamap]
+    })
+  }
 }
 
 

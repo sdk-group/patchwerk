@@ -3,50 +3,65 @@
 let _ = require('lodash');
 
 class BasicDocument {
-	constructor(keymap, datachain) {
-		this.id = keymap.ids[0];
-		this.keymap = keymap;
-		this.owners = {};
-		if (datachain) this.processDatachain(datachain);
-	}
-	pickData(dataset) {
-		let len = this.ids.length;
-		let datachain = Array(len);
-		console.log('ids', this.ids);
+  constructor(keymap, parent) {
+    this.id = keymap.id;
+    this.keymap = keymap;
+    this.properties = {};
+    this.parent = parent;
+    this.is_changed = true;
+  }
+  pickData(dataset) {
+    return this.fillParent(dataset)
+      .fillThis(dataset)
+      .processDatachain();
+  }
+  fillParent(dataset) {
+    this.parent && this.parent.fillThis(dataset);
+    return this;
+  }
+  fillThis(dataset) {
+    let id = this.id;
+    this.properties = dataset[id];
+    //@TODO: process links here
 
+    return this;
+  }
+  get(name, options) {
 
-		while (len--) {
-			let item = this.ids[len];
-			datachain[len] = dataset[item].value;
-		}
+  }
+  set(name, value, options) {
+    let owner = this.findOwner(name);
 
-		this.processDatachain(datachain);
-		console.log('dataset', datachain);
+    if (!owner) throw new Error('No such property');
 
-		return this;
-	}
-	processDatachain(datachain) {
-		let composed = _.transform(datachain, (result, item) => {
-			!!item && _.defaults(result, item.value);
-		}, {});
+    if (owner.properties[name] === value) return this;
 
-		let key, value;
+    owner.properties[name] = value;
+    this.is_changed = true;
 
-		for (key in composed) {
-			value = composed[key];
-			this[key] = value;
-			this.owners[key] = this._ownerOf(key, datachain);
-		}
-	}
-	_ownerOf(param_name, datachain) {
-		let owner = false;
-		_.forEach(datachain, (d, index) => {
-			if (!_.has(d, ['value', param_name])) return true;
-			owner = d.value['@id'];
-			return false;
-		});
-		return owner;
-	}
+    return this;
+  }
+
+  findOwner(name) {
+    if (typeof this.properties.name != "undefined") return this;
+    if (!this.parent) return false;
+
+    return this.parent.findOwner(name);
+  }
+  isComplete() {
+    return this.id && !~this.id.indexOf('*');
+  }
+  isChanged() {
+    return this.is_changed;
+  }
+  saved() {
+    this.is_changed = false;
+
+    return true;
+  }
+  getSource() {
+    return this.properties;
+  }
 }
 
 module.exports = BasicDocument;
