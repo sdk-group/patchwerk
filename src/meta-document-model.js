@@ -76,30 +76,29 @@ class MetaModel {
 
 		return [...keys];
 	}
-	makeModel(params) {
+	makeModel(keymap) {
 		let Model = this.Model;
 
-		let item, len = this.descriptions.length;
-		let ids = Array(len);
-
-		while (len--) {
-			item = this.descriptions[len];
-			ids[len] = Templatizer(item.key, params);
-		}
-
-		return new Model(ids);
+		return new Model(keymap);
 	}
 	_singleObjectKeys(params, templates) {
 		let keys = new Set();
 		let len = templates.length;
-		let template;
+		let template, key;
 
-		this.object = this.makeModel(params);
+		let keymap = {
+			ids: Array(len)
+		};
 
 		while (len--) {
 			template = templates[len];
-			keys.add(Templatizer(template.key, params));
+			key = Templatizer(template.key, params);
+			keymap.ids[len] = key;
+
+			keys.add(key);
 		}
+
+		this.object = this.makeModel(keymap);
 
 		return [...keys];
 	}

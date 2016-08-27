@@ -7,7 +7,6 @@ function ArrayReducer(template, item) {
 };
 
 function ObjectReducer(template, value, param) {
-	console.log(value, param, template);
 	return template.replace('{' + param + '}', value)
 };
 

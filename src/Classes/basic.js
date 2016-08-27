@@ -3,9 +3,9 @@
 let _ = require('lodash');
 
 class BasicDocument {
-	constructor(ids, datachain) {
-		this.id = ids[0];
-		this.ids = ids;
+	constructor(keymap, datachain) {
+		this.id = keymap.ids[0];
+		this.keymap = keymap;
 		this.owners = {};
 		if (datachain) this.processDatachain(datachain);
 	}

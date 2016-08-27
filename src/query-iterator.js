@@ -9,15 +9,13 @@ class QueryIterator {
 		this.query = query;
 	}
 	length() {
-		let len = cursors.length;
 		let result = 1;
-		let i;
+		let max, name, entry;
 
-		for (i = 0; i < len; i++) {
-			let cursor = cursors[i];
-			let max = cursor.max
+		for (name in this.query) {
+			entry = this.query[name];
+			max = entry.length || 1;
 			if (max) result *= max;
-
 		}
 
 		return result;
