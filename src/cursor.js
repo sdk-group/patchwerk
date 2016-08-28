@@ -4,19 +4,24 @@ class Cursor {
 	constructor(name, entry) {
 		this.name = name;
 		this.entry = entry;
-		this.pos = 0;
-		this.max = entry.length || 0;
+		this.is_iterable = entry.constructor === Array
+
+		if (this.is_iterable) {
+			this.pos = 0;
+			this.isIterable = entry.constructor === Array;
+			this.max = entry.length || 1;
+		}
 	}
 	reset() {
 		this.pos = 0;
 	}
 	inc() {
-		if (this.pos + 1 >= this.max) return false;
+		if (!this.is_iterable || this.pos + 1 >= this.max) return false;
 		this.pos++;
 		return true
 	}
 	value() {
-		return this.max ? this.entry[this.pos] : this.entry;
+		return this.is_iterable ? this.entry[this.pos] : this.entry;
 	}
 }
 

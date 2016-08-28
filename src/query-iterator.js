@@ -14,7 +14,7 @@ class QueryIterator {
 
 		for (name in this.query) {
 			entry = this.query[name];
-			max = entry.length || 1;
+			max = entry.constructor === Array ? entry.length || 1 : 1;
 			if (max) result *= max;
 		}
 

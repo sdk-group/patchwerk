@@ -35,7 +35,7 @@ describe('Fresh data!', () => {
 			department: "department-1",
 			counter: 1
 		}).then(d => {
-			console.log(d.id);
+			// console.log('Service id:', d.id);
 		})
 	});
 	it('Collection', () => {
@@ -44,7 +44,9 @@ describe('Fresh data!', () => {
 			date: "2016-06-20",
 			counter: '*'
 		}).then(d => {
-			console.log(d.length)
+			console.log('Service length:', d.length);
+			console.log('Service ID:', d[1].get('@id'))
+
 		})
 	});
 
@@ -52,7 +54,7 @@ describe('Fresh data!', () => {
 		p.get('Ticket', {
 			key: "ticket-department-1-2016-06-20--1"
 		}).then(d => {
-			console.log(d)
+			// console.log(d)
 		})
 	});
 

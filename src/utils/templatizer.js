@@ -11,7 +11,7 @@ function ObjectReducer(template, value, param) {
 };
 
 function FormTemplateString(template_string, params) {
-	let reducer = _.isArray(params) ? ArrayReducer : ObjectReducer;
+	let reducer = params.constructor === Array ? ArrayReducer : ObjectReducer;
 	return _.reduce(params, reducer, template_string);
 };
 
