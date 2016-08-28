@@ -9,6 +9,7 @@ class BasicDocument {
 		this.properties = {};
 		this.parent = parent;
 		this.is_changed = false;
+		this.type = _.upperFirst(_.camelCase(this.constructor.name));
 	}
 	pickData(dataset) {
 		return this.fillParent(dataset)
@@ -22,7 +23,12 @@ class BasicDocument {
 		let id = this.id;
 		let data = dataset[id] || {};
 		this.properties = data.value || {};
+		this.properties['@type'] = this.type;
 		//@FIXIT: reomove this!
+		this.parent && _.forEach(this.parent.properties, (property, name) => {
+			this[name] = property;
+		});
+
 		_.forEach(this.properties, (property, name) => {
 			this[name] = property
 		});
@@ -76,6 +82,7 @@ class BasicDocument {
 		return this;
 	}
 	getSource() {
+		this.properties['@id'] = this.id;
 		return this.properties;
 	}
 }

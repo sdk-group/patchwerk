@@ -109,5 +109,19 @@ describe('Fresh data!', () => {
 				.then(c => console.log(c));
 
 		});
+		it('service new', () => {
+			let create = p.create('Service', {
+					label: "test"
+				}, {
+					department: "department-1",
+					counter: "*"
+				})
+				.then(service => {
+					console.log(service.id);
+					return p.save(service);
+				})
+				.then(c => console.log(c));
+
+		});
 	})
 });

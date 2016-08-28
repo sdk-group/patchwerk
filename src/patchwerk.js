@@ -44,15 +44,16 @@ class Patchwerk {
 		if (!is_changed) return Promise.resolve(true);
 
 		return this._complete(model)
-			.then(completeModel => this.saveSourceData(completeModel))
+			.then(completeModel => completeModel.getSource())
+			.then(sourceData => this.saveSourceData(sourceData))
 			.then(status => status && model.saved());
 	}
 	_complete(model) {
 		let is_complete = model.isComplete();
 
 		if (is_complete) return Promise.resolve(model);
-
-		return this.getCounter(model, query)
+		console.log(model);
+		return this.getCounter(model)
 			.then(counter => counter && counter.inc(this.emitter))
 			.then(index => {
 				if (index === false) throw new Error('can not inc() counter');
@@ -87,12 +88,9 @@ class Patchwerk {
 			args: [subset]
 		})
 	}
-	saveSourceData(completeModel) {
-		let datamap = completeModel.getSource();
-		let id = completeModel.id;
-		console.log(id, datamap);
+	saveSourceData(datamap) {
 		return this.emitter.addTask('database.upsertNodes', {
-			args: [id, datamap]
+			args: [datamap]
 		})
 	}
 }
