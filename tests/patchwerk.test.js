@@ -23,6 +23,10 @@ queue.listenTask('database.getMulti', function (params) {
 	return db.getMulti(params);
 });
 
+queue.listenTask('database.upsertNodes', function (params) {
+	return db.upsertNodes(params);
+});
+
 
 describe('Fresh data!', () => {
 	let p;
@@ -78,19 +82,32 @@ describe('Fresh data!', () => {
 				counter: "*"
 			}).
 			then(d => d.get('wololo'));
-			expect(create).to.eventually.equal('ololo');
+
+
 		});
 
 		it('service', () => {
-			p.create('Service', {
-				label: "ololo"
+			let create = p.create('Service', {
+				label: "test"
 			}, {
 				department: "department-1",
 				counter: "10"
-			}).
-			then(d => {
-				console.log(d);
-			})
+			});
+
+			expect(create).to.eventually.have.deep.property('properties.label', 'test')
+		});
+	})
+	describe('Save', () => {
+		it('service', () => {
+			let create = p.create('Service', {
+					label: "test"
+				}, {
+					department: "department-1",
+					counter: "XXX"
+				})
+				.then(service => p.save(service))
+				.then(c => console.log(c));
+
 		});
 	})
 });

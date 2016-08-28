@@ -22,6 +22,10 @@ class BasicDocument {
 		let id = this.id;
 		let data = dataset[id] || {};
 		this.properties = data.value || {};
+		//@FIXIT: reomove this!
+		_.forEach(this.properties, (property, name) => {
+			this[name] = property
+		});
 		//@TODO: process links here
 
 		return this;

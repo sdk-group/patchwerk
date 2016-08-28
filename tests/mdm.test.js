@@ -6,7 +6,7 @@ let QueryIterator = require('./query-iterator.js');
 describe('some tests', () => {
 	let iterator;
 	let cursor;
-	let counter = 100000;
+	let counter = 1000;
 
 	describe('incCursor x' + counter, () => {
 		beforeEach(() => {

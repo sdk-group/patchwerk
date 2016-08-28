@@ -21,7 +21,7 @@ class Patchwerk {
 
 		return this.processQuery(metaDocument, query)
 			.then(query_params => metaDocument.getKeys(query_params))
-			.then(uniq_subset => this.getSoruceData(uniq_subset))
+			.then(uniq_subset => this.getSourceData(uniq_subset))
 			.then(data => metaDocument.build(data));
 	}
 	create(model_def, source, query) {
@@ -44,8 +44,7 @@ class Patchwerk {
 		if (!is_changed) return Promise.resolve(true);
 
 		return this._complete(model)
-			.then(completeModel => completeModel.getSource())
-			.then(sourceData => this.saveSourceData(sourceData))
+			.then(completeModel => this.saveSourceData(completeModel))
 			.then(status => status && model.saved());
 	}
 	_complete(model) {
@@ -83,14 +82,17 @@ class Patchwerk {
 	processCounter(Model, query) {
 		return this.getCounter(Model, query).then(counter => counter && counter.range());
 	}
-	getSoruceData(subset) {
+	getSourceData(subset) {
 		return this.emitter.addTask('database.getMulti', {
 			args: [subset]
 		})
 	}
-	saveSoruceData(datamap) {
-		return this.emitter.addTask('database.upsertMulti', {
-			args: [datamap]
+	saveSourceData(completeModel) {
+		let datamap = completeModel.getSource();
+		let id = completeModel.id;
+		console.log(id, datamap);
+		return this.emitter.addTask('database.upsertNodes', {
+			args: [id, datamap]
 		})
 	}
 }
