@@ -8,7 +8,7 @@ class BasicDocument {
 		this.keymap = keymap;
 		this.properties = {};
 		this.parent = parent;
-		this.is_changed = true;
+		this.is_changed = false;
 	}
 	pickData(dataset) {
 		return this.fillParent(dataset)
@@ -20,7 +20,8 @@ class BasicDocument {
 	}
 	fillThis(dataset) {
 		let id = this.id;
-		this.properties = dataset[id].value || {};
+		let data = dataset[id] || {};
+		this.properties = data.value || {};
 		//@TODO: process links here
 
 		return this;
@@ -63,7 +64,12 @@ class BasicDocument {
 	saved() {
 		this.is_changed = false;
 
-		return true;
+		return this;
+	}
+	changed() {
+		this.is_changed = true;
+
+		return this;
 	}
 	getSource() {
 		return this.properties;

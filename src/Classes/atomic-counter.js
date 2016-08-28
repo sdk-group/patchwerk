@@ -14,13 +14,16 @@ class AtomicCounter extends BasicDocument {
 		return this;
 	}
 	range() {
-		if (!_.isNumber(this.value)) throw new Error('Atomic counter value is not a number');
+		if (!_.isNumber(this.value))[];
 
 		return _.range(this.value + 1)
 	}
 	inc(emitter) {
-		return emitter.addTask('database.inc', {
-			args: [this.id]
+		let args = [this.id, 1, {
+			initial: 0
+		}];
+		return emitter.addTask('database.counter', {
+			args: args
 		}).then(result => this.value = result.value)
 	}
 }

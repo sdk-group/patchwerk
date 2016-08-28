@@ -9,7 +9,7 @@ class Cursor {
 		if (this.is_iterable) {
 			this.pos = 0;
 			this.isIterable = entry.constructor === Array;
-			this.max = entry.length || 1;
+			this.max = entry.length;
 		}
 	}
 	reset() {

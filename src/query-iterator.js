@@ -14,7 +14,7 @@ class QueryIterator {
 
 		for (name in this.query) {
 			entry = this.query[name];
-			max = entry.constructor === Array ? entry.length || 1 : 1;
+			max = entry.constructor === Array ? entry.length : 1;
 			if (max) result *= max;
 		}
 
@@ -48,7 +48,7 @@ class QueryIterator {
 		let cursors = this.init();
 		let flag = -1;
 		return {
-			next: function() {
+			next: function () {
 				flag = (flag === -1) ? true : _this.incCursor(cursors);
 				let len = cursors.length;
 				let acc = Array(len);

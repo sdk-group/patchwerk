@@ -15,11 +15,11 @@ db.init({
 	"default_bucket": "rdf"
 });
 
-queue.listenTask('database.get', function(params) {
+queue.listenTask('database.get', function (params) {
 	return db.get(params);
 });
 
-queue.listenTask('database.getMulti', function(params) {
+queue.listenTask('database.getMulti', function (params) {
 	return db.getMulti(params);
 });
 
@@ -29,42 +29,68 @@ describe('Fresh data!', () => {
 	before(() => {
 		p = new Patchwerk(queue);
 	});
+	describe('Get', () => {
+		it('Single', () => {
+			p.get('Service', {
+				department: "department-1",
+				counter: 1
+			}).then(d => {
+				// console.log('Service id:', d.id);
+			})
+		});
+		it('Collection', () => {
+			p.get('Service', {
+				department: "department-1",
+				date: "2016-06-20",
+				counter: '*'
+			}).then(d => {
+				console.log('Service length:', d.length);
+				console.log('Service ID:', d[1].get('@id'))
 
-	it('Single', () => {
-		p.get('Service', {
-			department: "department-1",
-			counter: 1
-		}).then(d => {
-			// console.log('Service id:', d.id);
-		})
-	});
-	it('Collection', () => {
-		p.get('Service', {
-			department: "department-1",
-			date: "2016-06-20",
-			counter: '*'
-		}).then(d => {
-			console.log('Service length:', d.length);
-			console.log('Service ID:', d[1].get('@id'))
+			})
+		});
 
-		})
-	});
+		it('Ticket', () => {
+			p.get('Ticket', {
+				key: "ticket-department-1-2016-06-20--1"
+			}).then(d => {
+				// console.log(d)
+			})
+		});
 
-	it('Ticket', () => {
-		p.get('Ticket', {
-			key: "ticket-department-1-2016-06-20--1"
-		}).then(d => {
-			// console.log(d)
-		})
+		it('ServiceRoutingMap', () => {
+			p.get('ServiceRoutingMap', {
+				department: "department-1"
+			}).then(d => {
+				console.log(d);
+				let r = d.getRoutes('service-1');
+				console.log(r);
+			})
+		});
 	});
+	describe('Create', () => {
+		it('ticket', () => {
+			let create = p.create('Ticket', {
+				wololo: "ololo"
+			}, {
+				department: "department-1",
+				date: "2016-06-20",
+				counter: "*"
+			}).
+			then(d => d.get('wololo'));
+			expect(create).to.eventually.equal('ololo');
+		});
 
-	it('ServiceRoutingMap', () => {
-		p.get('ServiceRoutingMap', {
-			department: "department-1"
-		}).then(d => {
-			console.log(d);
-			let r = d.getRoutes('service-1');
-			console.log(r);
-		})
-	});
+		it('service', () => {
+			p.create('Service', {
+				label: "ololo"
+			}, {
+				department: "department-1",
+				counter: "10"
+			}).
+			then(d => {
+				console.log(d);
+			})
+		});
+	})
 });

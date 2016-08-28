@@ -7,7 +7,7 @@ const Templatizer = require('./utils/templatizer.js');
 const QueryIterator = require('./query-iterator.js');
 const MetaDocument = require('./meta-document-model.js');
 
-let discover = function(model_name) {
+let discover = function (model_name) {
 	let name = _.kebabCase(model_name);
 	return require(`./classes/${name}.js`)
 }
@@ -25,14 +25,17 @@ class Patchwerk {
 			.then(data => metaDocument.build(data));
 	}
 	create(model_def, source, query) {
-		let metaDocument = new MetaDocument(model_def, options);
+		let metaDocument = new MetaDocument(model_def, {});
 
 		return this.processCreateQuery(metaDocument, query)
 			.then(query_params => metaDocument.getKeys(query_params))
 			.then(() => {
 				let data = {};
-				data["creation-data"] = source;
-				return metaDocument.build(data);
+				let id = metaDocument.getKey();
+				data[id] = {
+					value: source
+				};
+				return metaDocument.build(data).changed();
 			});
 	}
 	save(model) {
@@ -58,7 +61,7 @@ class Patchwerk {
 				return model.updateCounter(index);
 			})
 	}
-	processCreateQuery(query) {
+	processCreateQuery(Model, query) {
 		//@TODO: check if it's complete object description or not
 		return Promise.resolve(query);
 	}

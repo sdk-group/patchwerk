@@ -5,12 +5,12 @@ const Promise = require('bluebird');
 
 const Templatizer = require('./utils/templatizer.js');
 
-let discover = function(model_name) {
+let discover = function (model_name) {
 	let name = _.kebabCase(model_name);
 	return require(`./classes/${name}.js`)
 }
 
-let isIterable = function(obj) {
+let isIterable = function (obj) {
 	if (!obj) {
 		return false;
 	}
@@ -38,6 +38,10 @@ class MetaModel {
 	static getModel(definition) {
 		return _.isString(definition) ? discover(definition) : definition
 	}
+	getKey() {
+		if (!this.object) throw new Error('create object first!');
+		return this.object.constructor === Array ? _.map(this.object, 'id') : this.object.id;
+	}
 	isCollection(query) {
 		let has_counter = this.getCounter();
 
@@ -56,9 +60,13 @@ class MetaModel {
 	}
 	_collectionKeys(iterator) {
 		let templates = this.descriptions;
+
 		let object_count = iterator.length();
-		let object_counter = 0;
 		this.object = Array(object_count);
+
+		if (object_count == 0) return [];
+
+		let object_counter = 0;
 
 		let keys = new Set();
 		let len = templates.length;
