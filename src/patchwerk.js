@@ -7,7 +7,7 @@ const Templatizer = require('./utils/templatizer.js');
 const QueryIterator = require('./query-iterator.js');
 const MetaDocument = require('./meta-document-model.js');
 
-let discover = function (model_name) {
+let discover = function(model_name) {
 	let name = _.kebabCase(model_name);
 	return require(`./classes/${name}.js`)
 }
@@ -31,7 +31,7 @@ class Patchwerk {
 			.then(query_params => metaDocument.getKeys(query_params))
 			.then(() => {
 				let data = {};
-				let id = metaDocument.getKey();
+				let id = metaDocument.getFirstKey();
 				data[id] = {
 					value: source
 				};
@@ -52,8 +52,8 @@ class Patchwerk {
 		let is_complete = model.isComplete();
 
 		if (is_complete) return Promise.resolve(model);
-		console.log(model);
-		return this.getCounter(model)
+
+		return this.getCounter(model, {})
 			.then(counter => counter && counter.inc(this.emitter))
 			.then(index => {
 				if (index === false) throw new Error('can not inc() counter');
@@ -63,6 +63,7 @@ class Patchwerk {
 	}
 	processCreateQuery(Model, query) {
 		//@TODO: check if it's complete object description or not
+
 		return Promise.resolve(query);
 	}
 	processQuery(Model, query) {
@@ -78,6 +79,7 @@ class Patchwerk {
 	}
 	getCounter(model, query) {
 		let counter_name = model.getCounter();
+		console.log('CN', counter_name);
 		return !counter_name ? Promise.resolve(false) : this.get(counter_name, query)
 	}
 	processCounter(Model, query) {

@@ -48,17 +48,14 @@ class QueryIterator {
 		let cursors = this.init();
 		let flag = -1;
 		return {
-			next: function () {
+			next: function() {
 				flag = (flag === -1) ? true : _this.incCursor(cursors);
 				let len = cursors.length;
-				let acc = Array(len);
+				let acc = {};
 
 				while (len--) {
 					let cursor = cursors[len];
-					acc[len] = {
-						name: cursor.name,
-						value: cursor.value()
-					};
+					acc[cursor.name] = cursor.value;
 				}
 
 

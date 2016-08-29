@@ -5,12 +5,12 @@ const Promise = require('bluebird');
 
 const Templatizer = require('./utils/templatizer.js');
 
-let discover = function (model_name) {
+let discover = function(model_name) {
 	let name = _.kebabCase(model_name);
 	return require(`./classes/${name}.js`)
 }
 
-let isIterable = function (obj) {
+let isIterable = function(obj) {
 	if (!obj) {
 		return false;
 	}
@@ -38,7 +38,7 @@ class MetaModel {
 	static getModel(definition) {
 		return _.isString(definition) ? discover(definition) : definition
 	}
-	getKey() {
+	getFirstKey() {
 		if (!this.object) throw new Error('create object first!');
 		return this.object.constructor === Array ? _.map(this.object, 'id') : this.object.id;
 	}
@@ -112,9 +112,14 @@ class MetaModel {
 		return [...keys];
 	}
 	makeKeymap(keymap, keyset, template, params) {
+		//@TODO: maybe move it to class?
 		let key = params.key ? params.key : Templatizer(template.key, params);
 		keymap.id = key;
 		keyset.add(key);
+
+		//@TODO: do it better on Collection
+		if (template.counter) keymap.counter = Templatizer(template.counter, params);
+
 		//@TODO: resolve external fields here
 	}
 	build(data) {

@@ -7,7 +7,6 @@ let couchbird = require('Couchbird')({
 	"n1ql": "194.226.171.100:8093"
 });
 
-
 let Database = require('../node_modules/iris-service-database/build/Database/database.js');
 let db = new Database();
 
@@ -15,16 +14,21 @@ db.init({
 	"default_bucket": "rdf"
 });
 
-queue.listenTask('database.get', function (params) {
+
+queue.listenTask('database.get', function(params) {
 	return db.get(params);
 });
 
-queue.listenTask('database.getMulti', function (params) {
+queue.listenTask('database.getMulti', function(params) {
 	return db.getMulti(params);
 });
 
-queue.listenTask('database.upsertNodes', function (params) {
+queue.listenTask('database.upsertNodes', function(params) {
 	return db.upsertNodes(params);
+});
+
+queue.listenTask('database.counter', function(params) {
+	return db.counter(params);
 });
 
 
@@ -49,7 +53,7 @@ describe('Fresh data!', () => {
 				counter: '*'
 			}).then(d => {
 				console.log('Service length:', d.length);
-				console.log('Service ID:', d[1].get('@id'))
+				console.log('Service ID:', _.map(d, x => x.keymap.id))
 
 			})
 		});
@@ -117,10 +121,10 @@ describe('Fresh data!', () => {
 					counter: "*"
 				})
 				.then(service => {
-					console.log(service.id);
+					console.log(service.keymap);
 					return p.save(service);
 				})
-				.then(c => console.log(c));
+				.then(c => console.log('result', c));
 
 		});
 	})

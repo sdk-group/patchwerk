@@ -1,7 +1,7 @@
 'use strict'
 
 let QueryIterator = require('./query-iterator.js');
-
+let Templatizer = require('./utils/templatizer.js');
 
 describe('some tests', () => {
 	let iterator;
@@ -32,6 +32,61 @@ describe('some tests', () => {
 				let x = Math.random();
 			}
 
+		})
+	})
+
+	var tc = 10000;
+	describe('Templatizer x' + tc, () => {
+		it('template string', () => {
+
+			for (var i = 0; i < tc; i++) {
+				var params = {
+					x: 1,
+					z: 'string',
+					q: Math.random()
+
+				};
+				var ans = `oooo ${params.x} pppp ${params.z} lllll ${params.q}`;
+			}
+		})
+
+		it(' Templatizer', () => {
+			var params = {
+				x: 1,
+				z: 'string',
+				q: Math.random()
+
+			};
+			for (var i = 0; i < tc; i++) {
+
+				var ans = Templatizer('oooo {x} pppp {z} lllll {q}', params)
+			}
+
+		})
+
+		it('function summ', () => {
+			var params = {
+				x: 1,
+				z: 'string',
+				q: Math.random()
+
+			};
+			for (var i = 0; i < tc; i++) {
+				var ans = Templatizer((x) => 'oooo ' + x.x + ' pppp ' + x.z + ' lllll ' + x.q, params)
+			}
+		})
+
+		it('tm + tz', () => {
+			var params = {
+				x: 1,
+				z: 'string',
+				q: Math.random()
+
+			};
+
+			for (var i = 0; i < tc; i++) {
+				var ans = Templatizer((p) => `oooo ${p.x} pppp ${p.z} lllll ${p.q}`, params)
+			}
 		})
 
 

@@ -11,6 +11,9 @@ class BasicDocument {
 		this.is_changed = false;
 		this.type = _.upperFirst(_.camelCase(this.constructor.name));
 	}
+	getCounter() {
+		return this.keymap.counter;
+	}
 	pickData(dataset) {
 		return this.fillParent(dataset)
 			.fillThis(dataset);
