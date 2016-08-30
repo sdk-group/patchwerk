@@ -20,7 +20,7 @@ class AtomicCounter extends BasicDocument {
 	}
 	inc(emitter) {
 		let args = [this.id, 1, {
-			initial: 0
+			initial: this.initial || 0
 		}];
 		return emitter.addTask('database.counter', {
 			args: args
