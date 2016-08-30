@@ -9,14 +9,14 @@ class AtomicCounter extends BasicDocument {
 		super(id, datachain);
 	}
 	pickData(dataset) {
-		this.value = dataset[this.id].value;
+		this.properties = dataset[this.id].value;
 
 		return this;
 	}
 	range() {
-		if (!_.isNumber(this.value))[];
+		if (!_.isNumber(this.properties)) return [];
 
-		return _.range(this.value + 1)
+		return _.range(this.properties + 1)
 	}
 	inc(emitter) {
 		let args = [this.id, 1, {
@@ -24,7 +24,10 @@ class AtomicCounter extends BasicDocument {
 		}];
 		return emitter.addTask('database.counter', {
 			args: args
-		}).then(result => this.value = result.value)
+		}).then(result => this.properties = result.value)
+	}
+	getSource() {
+		return this.properties;
 	}
 }
 
