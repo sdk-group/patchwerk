@@ -3,7 +3,7 @@
 let QueryIterator = require('./query-iterator.js');
 let Templatizer = require('./utils/templatizer.js');
 
-describe('some tests', () => {
+describe.only('some tests', () => {
 	let iterator;
 	let cursor;
 	let counter = 1000;
@@ -35,7 +35,7 @@ describe('some tests', () => {
 		})
 	})
 
-	var tc = 10000;
+	var tc = 1000000;
 	describe('Templatizer x' + tc, () => {
 		it('template string', () => {
 
@@ -73,6 +73,30 @@ describe('some tests', () => {
 			};
 			for (var i = 0; i < tc; i++) {
 				var ans = Templatizer((x) => 'oooo ' + x.x + ' pppp ' + x.z + ' lllll ' + x.q, params)
+			}
+		})
+
+		it('function summ pre computed', () => {
+			var params = {
+				x: 1,
+				z: 'string',
+				q: Math.random()
+
+			};
+			let strings = ['oooo ', ' pppp ', ' lllll '];
+			let p = ['x', 'z', 'q'];
+			let f = function() {
+				let len = strings.length;
+				let result = '';
+
+				while (len--) {
+					result = strings[len] + p[len] + result;
+				}
+
+				return result
+			}
+			for (var i = 0; i < tc; i++) {
+				var ans = Templatizer(f, params)
 			}
 		})
 

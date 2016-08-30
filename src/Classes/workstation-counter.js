@@ -9,7 +9,7 @@ class WorkstationCounter extends AtomicCounter {
 		}
 	}
 	range(query) {
-		let available_workstations = _.get(this.value, ['content', 'control-panel']);
+		let available_workstations = _.get(this.properties, ['content', 'control-panel']);
 
 		if (query && query.state == 'active') {
 			available_workstations = _.filter(available_workstations, ['state', 'active']);

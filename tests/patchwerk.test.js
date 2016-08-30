@@ -106,7 +106,7 @@ describe('Fresh data!', () => {
 			let create = p.create('Service', {
 					label: "test"
 				}, {
-					department: "department-1",
+					department: "department-test",
 					counter: "XXX"
 				})
 				.then(service => p.save(service))
@@ -117,7 +117,7 @@ describe('Fresh data!', () => {
 			let create = p.create('Service', {
 					label: "test"
 				}, {
-					department: "department-1",
+					department: "department-test",
 					counter: "*"
 				})
 				.then(service => {
