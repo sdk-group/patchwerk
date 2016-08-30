@@ -9,10 +9,6 @@ class Schedule extends BasicDocument {
 			"counter": "schedule-counter"
 		};
 	}
-	constructor(id, datachain) {
-		super(id, datachain);
-		this.initial = 200;
-	}
 }
 
 module.exports = Schedule;
