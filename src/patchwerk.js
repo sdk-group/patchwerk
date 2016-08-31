@@ -79,11 +79,12 @@ class Patchwerk {
 	}
 	getCounter(model, query) {
 		let counter_name = model.getCounter();
-		console.log('CN', counter_name);
+
 		return !counter_name ? Promise.resolve(false) : this.get(counter_name, query)
 	}
 	processCounter(Model, query) {
-		if (query.counter.constructor === Array) return query.counter;
+		if (query.counter.constructor === Array) return Promise.resolve(query.counter);
+
 		return this.getCounter(Model, query).then(counter => counter && counter.range());
 	}
 	getSourceData(subset) {
