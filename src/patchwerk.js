@@ -7,7 +7,7 @@ const Templatizer = require('./utils/templatizer.js');
 const QueryIterator = require('./query-iterator.js');
 const MetaDocument = require('./meta-document-model.js');
 
-let discover = function(model_name) {
+let discover = function (model_name) {
 	let name = _.kebabCase(model_name);
 	return require(`./classes/${name}.js`)
 }
@@ -83,6 +83,7 @@ class Patchwerk {
 		return !counter_name ? Promise.resolve(false) : this.get(counter_name, query)
 	}
 	processCounter(Model, query) {
+		if (query.counter.constructor === Array) return query.counter;
 		return this.getCounter(Model, query).then(counter => counter && counter.range());
 	}
 	getSourceData(subset) {
