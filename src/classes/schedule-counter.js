@@ -12,12 +12,6 @@ class ScheduleCounter extends AtomicCounter {
 		super(id, datachain);
 		this.initial = 200;
 	}
-	inc(emitter) {
-		return super.inc(emitter).then(res => {
-			console.log(res);
-			return res;
-		})
-	}
 }
 
 module.exports = ScheduleCounter;
