@@ -27,6 +27,16 @@ class ServiceCounter extends AtomicCounter {
 			args: [data]
 		});
 	}
+	add(params, patchwerk) {
+		//@NOTE: never use it without strong need
+		//@NOTE: this method is fucking unsafe
+		//@TODO: rework this ugly concept
+		let id = params.id;
+
+		this.properties.content.push(id);
+
+		return patchwerk.save(this)
+	}
 }
 
 module.exports = ServiceCounter;
