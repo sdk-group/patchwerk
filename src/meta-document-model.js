@@ -5,12 +5,12 @@ const Promise = require('bluebird');
 
 const Templatizer = require('./utils/templatizer.js');
 
-let discover = function(model_name) {
+let discover = function (model_name) {
 	let name = _.kebabCase(model_name);
 	return require(`./classes/${name}.js`)
 }
 
-let isIterable = function(obj) {
+let isIterable = function (obj) {
 	if (!obj) {
 		return false;
 	}
@@ -79,6 +79,7 @@ class MetaModel {
 			for (i = len - 1; i >= 0; i--) {
 				this.makeKeymap(keymap, keys, templates[i], params);
 				obj = this.makeModel(keymap, prev, i);
+				obj.setCreationParams(params);
 				prev = obj;
 			}
 
@@ -104,6 +105,7 @@ class MetaModel {
 			keymap = {};
 			this.makeKeymap(keymap, keys, templates[len], params);
 			obj = this.makeModel(keymap, prev, len);
+			obj.setCreationParams(params);
 			prev = obj;
 		}
 

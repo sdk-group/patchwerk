@@ -7,9 +7,14 @@ class BasicDocument {
 		this.id = keymap.id;
 		this.keymap = keymap;
 		this.properties = {};
+		this.creation_parms = {};
 		this.parent = parent;
 		this.is_changed = false;
 		this.type = _.upperFirst(_.camelCase(this.constructor.name));
+	}
+	setCreationParams(params) {
+		this.creation_parms = params;
+		return this;
 	}
 	getCounter() {
 		return this.keymap.counter;
