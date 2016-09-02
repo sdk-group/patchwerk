@@ -17,7 +17,7 @@ class ServiceCounter extends AtomicCounter {
 	inc(emitter) {
 		let ids = this.properties.content;
 		let last = _.last(this.properties.content);
-		let id = 'service-' + (pasreInt(last.split('-')[1]) + 1);
+		let id = 'service-' + (parseInt(last.split('-')[1]) + 1);
 
 		this.properties.content.push(id);
 
