@@ -12,10 +12,10 @@ class GlobalMembershipDescription extends AtomicCounter {
 	}
 	range() {
 		if (!this.properties) return [];
-
+		let len = "human-".length;
 		return _.chain(this.properties.content)
 			.filter(item => item.organization == this.creation_parms.department)
-			.map('member').value();
+			.map('member', item => item.slice(len, item.length)).value();
 	}
 	add(params, patchwerk) {
 		//@NOTE: never use it without strong need
