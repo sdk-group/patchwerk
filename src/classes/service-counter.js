@@ -12,7 +12,9 @@ class ServiceCounter extends AtomicCounter {
 	range() {
 		if (!this.properties) return [];
 
-		return this.properties.content;
+		return _.map(this.properties.content, item => {
+			return item.replace('service-', '');
+		});
 	}
 	inc(emitter) {
 		let ids = this.properties.content;
@@ -21,7 +23,7 @@ class ServiceCounter extends AtomicCounter {
 
 		this.properties.content.push(id);
 
-		let data = this.getSourceData();
+		let data = this.getSource();
 
 		return emitter.addTask('database.upsertNodes', {
 			args: [data]
