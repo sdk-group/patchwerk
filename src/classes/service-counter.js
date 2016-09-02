@@ -12,22 +12,20 @@ class ServiceCounter extends AtomicCounter {
 	range() {
 		if (!this.properties) return [];
 
-		return _.map(this.properties.content, item => {
-			return item.replace('service-', '');
-		});
+		return _.map(this.properties.content, item => item.replace('service-', ''));
 	}
 	inc(emitter) {
 		let ids = this.properties.content;
 		let last = _.last(this.properties.content);
-		let id = 'service-' + (parseInt(last.split('-')[1]) + 1);
+		let id = (parseInt(last.split('-')[1]) + 1);
 
-		this.properties.content.push(id);
+		this.properties.content.push('service-' + id);
 
 		let data = this.getSource();
 
 		return emitter.addTask('database.upsertNodes', {
 			args: [data]
-		});
+		}).then(data => id);
 	}
 	add(params, patchwerk) {
 		//@NOTE: never use it without strong need
