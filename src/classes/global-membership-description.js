@@ -15,7 +15,7 @@ class GlobalMembershipDescription extends AtomicCounter {
 
 		return _.chain(this.properties.content)
 			.filter(item => item.organization == this.creation_parms.department)
-			.map('@id').value();
+			.map('member').value();
 	}
 	add(params, patchwerk) {
 		//@NOTE: never use it without strong need
