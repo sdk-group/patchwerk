@@ -15,7 +15,9 @@ class GlobalMembershipDescription extends AtomicCounter {
 		let len = "human-".length;
 		return _.chain(this.properties.content)
 			.filter(item => item.organization == this.creation_parms.department)
-			.map('member', item => item.slice(len, item.length)).value();
+			.map('member')
+			.map(item => item.slice(len, item.length))
+			.value();
 	}
 	add(params, patchwerk) {
 		//@NOTE: never use it without strong need
