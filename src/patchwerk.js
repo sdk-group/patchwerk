@@ -35,25 +35,26 @@ class Patchwerk {
 				data[id] = {
 					value: source
 				};
-				return metaDocument.build(data).changed();
+				return metaDocument.build(data)
+					.changed();
 			});
 	}
-	save(model) {
+	save(model, query) {
 		let is_changed = model.isChanged();
 
 		if (!is_changed) return Promise.resolve(true);
 
-		return this._complete(model)
+		return this._complete(model, query)
 			.then(completeModel => completeModel.getSource())
 			.then(sourceData => this.saveSourceData(sourceData))
 			.then(status => status && model.saved());
 	}
-	_complete(model) {
+	_complete(model, query) {
 		let is_complete = model.isComplete();
 
 		if (is_complete) return Promise.resolve(model);
 
-		return this.getCounter(model, {})
+		return this.getCounter(model, query)
 			.then(counter => counter && counter.inc(this.emitter))
 			.then(index => {
 				if (index === false) throw new Error('can not inc() counter');
@@ -71,11 +72,12 @@ class Patchwerk {
 
 		if (!is_colletction) return Promise.resolve(query);
 
-		return this.processCounter(Model, query).then(counter => {
-			if (counter) query.counter = counter;
+		return this.processCounter(Model, query)
+			.then(counter => {
+				if (counter) query.counter = counter;
 
-			return new QueryIterator(query);
-		})
+				return new QueryIterator(query);
+			})
 	}
 	getCounter(model, query) {
 		let counter_name = model.getCounter();
@@ -85,7 +87,8 @@ class Patchwerk {
 	processCounter(Model, query) {
 		if (query.counter.constructor === Array) return Promise.resolve(query.counter);
 
-		return this.getCounter(Model, query).then(counter => counter && counter.range());
+		return this.getCounter(Model, query)
+			.then(counter => counter && counter.range());
 	}
 	getSourceData(subset) {
 		return this.emitter.addTask('database.getMulti', {
