@@ -13,7 +13,7 @@ class BasicDocument {
 		this.type = _.upperFirst(_.camelCase(this.constructor.name));
 	}
 	setCreationParams(params) {
-		this.creation_parms = params;
+		this.creation_params = params;
 		return this;
 	}
 	getCounter() {

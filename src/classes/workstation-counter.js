@@ -8,7 +8,8 @@ class WorkstationCounter extends AtomicCounter {
 			"key": "cache_workstations_{department}"
 		}
 	}
-	range(query) {
+	range() {
+		let query = this.creation_params;
 		let available_workstations = _.get(this.properties, ['content', 'control-panel']);
 
 		if (query && query.state == 'active') {
