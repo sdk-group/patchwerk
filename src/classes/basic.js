@@ -7,7 +7,7 @@ class BasicDocument {
 		this.id = keymap.id;
 		this.keymap = keymap;
 		this.properties = {};
-		this.creation_parms = {};
+		this.creation_params = {};
 		this.parent = parent;
 		this.is_changed = false;
 		this.type = _.upperFirst(_.camelCase(this.constructor.name));
