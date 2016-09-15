@@ -65,6 +65,7 @@ class Ticket extends BasicDocument {
 		while (l--) {
 			data[ticket_schema_keys[l]] = dataset[ticket_schema_keys[l]];
 		}
+		data.priority = data.priority || {};
 
 		super.fillThis(data);
 		this.priority_value = _.sum(_.map(this.properties.priority, 'value'));
@@ -80,11 +81,35 @@ class Ticket extends BasicDocument {
 	}
 
 	code() {
-		return this.properties.code;
+		return this.get('code');
 	}
 
 	state() {
-		return this.properties.state;
+		return this.get('state');
+	}
+
+	lockField(fieldname) {
+		if (!!this.get(fieldname)) {
+			let tmp = this.get('locked_fields') || {};
+			tmp[fieldname] = this.get(fieldname);
+			this.set('locked_fields', tmp);
+		}
+		return this;
+	}
+
+	modifyPriority(p_type, p_val) {
+		if (!p_type || !p_val)
+			return this;
+		let curr = this.get('priority');
+		curr[p_type] = {
+			value: _.parseInt(p_val)
+		};
+		this.set(curr.priority);
+		return this;
+	}
+
+	appendLabel(lbl) {
+		this.set('label', this.get('label') + lbl);
 	}
 
 	//ticket-session orchestrator requirements
