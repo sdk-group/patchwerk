@@ -6,6 +6,7 @@ const Templatizer = require('./utils/templatizer.js');
 
 const QueryIterator = require('./query-iterator.js');
 const MetaDocument = require('./meta-document-model.js');
+const MetaDocumentCollection = require('./meta-document-collection.js');
 
 let discover = function (model_name) {
 	let name = _.kebabCase(model_name);
@@ -16,8 +17,12 @@ class Patchwerk {
 	constructor(emitter) {
 		this.emitter = emitter;
 	}
+	static getModel(definition) {
+		return _.isString(definition) ? discover(definition) : definition
+	}
 	get(model_def, query, options) {
-		let metaDocument = new MetaDocument(model_def, options);
+		let Model = Patchwerk.getModel(model_def);
+		let metaDocument = Model.isCollection(query) ? new MetaDocument(Model, options) : new MetaDocumentCollection(Model, options);
 
 		return this.processQuery(metaDocument, query)
 			.then(query_params => metaDocument.getKeys(query_params))

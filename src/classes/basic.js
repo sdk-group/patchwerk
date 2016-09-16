@@ -12,6 +12,19 @@ class BasicDocument {
 		this.is_changed = false;
 		this.type = _.upperFirst(_.camelCase(this.constructor.name));
 	}
+	static isCollection(query) {
+		let has_counter = this.getCounter();
+
+		if (!has_counter) return false;
+
+		if (query.counter && (query.counter == '*' || query.counter.constructor === Array)) return true;
+
+		for (let name in query) {
+			if (query[name].counter && query[name].counter.constructor === Array) return true;
+		}
+
+		return false;
+	}
 	setCreationParams(params) {
 		this.creation_params = params;
 		return this;
