@@ -60,14 +60,22 @@ class Ticket extends BasicDocument {
 	}
 
 	fillThis(dataset) {
-		let l = ticket_schema_keys.length;
-		let data = {};
-		while (l--) {
-			data[ticket_schema_keys[l]] = dataset[ticket_schema_keys[l]];
-		}
-		data.priority = data.priority || {};
+		let l = ticket_schema_keys.length,
+			tmp;
+		let n_dataset = {};
+		if (dataset[this.id].value) {
+			let data = {};
+			while (l--) {
+				tmp = dataset[this.id].value[ticket_schema_keys[l]];
+				data[ticket_schema_keys[l]] = tmp === undefined ? null : tmp;
+			}
+			data.priority = data.priority || {};
+			n_dataset[this.id] = {
+				value: data
+			};
 
-		super.fillThis(data);
+		}
+		super.fillThis(n_dataset);
 		this.priority_value = _.sum(_.map(this.properties.priority, 'value'));
 		if (this.properties.dedicated_date && this.properties.dedicated_date.constructor !== String) {
 			this.properties.dedicated_date = this.properties.dedicated_date.format('YYYY-MM-DD');
@@ -104,12 +112,13 @@ class Ticket extends BasicDocument {
 		curr[p_type] = {
 			value: _.parseInt(p_val)
 		};
-		this.set(curr.priority);
+		this.set('priority', curr.priority);
 		return this;
 	}
 
 	appendLabel(lbl) {
-		this.set('label', this.get('label') + lbl);
+		console.log("LABEL==================================>>\n", this.get('label'), lbl);
+		this.set('label', this.get('label') + (lbl || ""));
 	}
 
 	//ticket-session orchestrator requirements
@@ -168,7 +177,8 @@ class Ticket extends BasicDocument {
 			key;
 		while (l--) {
 			key = keys[l];
-			this.set(key, data[key]);
+			if (ticket_schema[key])
+				this.set(key, data[key]);
 		}
 	}
 
