@@ -4,6 +4,7 @@ let BasicDocument = require('./basic.js');
 
 const ticket_schema = {
 	'label': String,
+	'session': String,
 	'locked_fields': Object,
 	'booking_method': String,
 	'source': String,
