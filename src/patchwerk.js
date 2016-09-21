@@ -39,7 +39,7 @@ class Patchwerk {
 					.changed();
 			});
 	}
-	save(model, query) {
+	save(model, query = {}) {
 		let is_changed = model.isChanged();
 
 		if (!is_changed) return Promise.resolve(true);
