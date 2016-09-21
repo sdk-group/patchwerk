@@ -14,10 +14,9 @@ class GlobalMembershipDescription extends AtomicCounter {
 		if (!this.properties) return [];
 		let len = "human-".length;
 		let department = this.creation_params.department || false;
-		let is_array = department.constructor == Array;
 
 		return _.chain(this.properties.content)
-			.filter(item => is_array ? !!~department.indexOf(item.organization) : item.organization == department)
+			.filter(item => item.organization == department)
 			.map('member')
 			.map(item => item.slice(len, item.length))
 			.value();
