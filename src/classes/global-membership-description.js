@@ -13,7 +13,7 @@ class GlobalMembershipDescription extends AtomicCounter {
 	range() {
 		if (!this.properties) return [];
 		let len = "human-".length;
-		let department = this.creation_params.department || false;
+		let department = this.creation_params && this.creation_params.department || false;
 
 		return _.chain(this.properties.content)
 			.filter(item => item.organization == department)
