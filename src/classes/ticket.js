@@ -117,9 +117,11 @@ class Ticket extends BasicDocument {
 		return this;
 	}
 
-	appendLabel(lbl) {
-		console.log("LABEL==================================>>\n", this.get('label'), lbl);
-		this.set('label', this.get('label') + (lbl || ""));
+	modifyLabel(lbl, method = 'append') {
+		let new_label = this.get('label');
+		(method == "append") && (new_label = new_label + (lbl || ""));
+		(method == "prepend") && (new_label = (lbl || "") + new_label);
+		this.set('label', new_label);
 	}
 
 	//ticket-session orchestrator requirements
