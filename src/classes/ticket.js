@@ -71,6 +71,7 @@ class Ticket extends BasicDocument {
 				data[ticket_schema_keys[l]] = tmp === undefined ? null : tmp;
 			}
 			data.priority = data.priority || {};
+			data.locked_fields = data.locked_fields || {};
 			n_dataset[this.id] = {
 				value: data
 			};
@@ -79,7 +80,7 @@ class Ticket extends BasicDocument {
 		super.fillThis(n_dataset);
 		this.priority_value = _.sum(_.map(this.properties.priority, 'value'));
 		if (this.properties.dedicated_date && this.properties.dedicated_date.constructor !== String) {
-			this.properties.dedicated_date = this.properties.dedicated_date.format('YYYY-MM-DD');
+			this.set("dedicated_date", this.properties.dedicated_date.format('YYYY-MM-DD'));
 		}
 		return this;
 	}
