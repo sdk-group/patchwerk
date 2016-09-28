@@ -71,6 +71,7 @@ class Ticket extends BasicDocument {
 				data[ticket_schema_keys[l]] = tmp === undefined ? null : tmp;
 			}
 			data.priority = data.priority || {};
+			data.locked_fields = data.locked_fields || {};
 			n_dataset[this.id] = {
 				value: data
 			};
@@ -79,7 +80,7 @@ class Ticket extends BasicDocument {
 		super.fillThis(n_dataset);
 		this.priority_value = _.sum(_.map(this.properties.priority, 'value'));
 		if (this.properties.dedicated_date && this.properties.dedicated_date.constructor !== String) {
-			this.properties.dedicated_date = this.properties.dedicated_date.format('YYYY-MM-DD');
+			this.set("dedicated_date", this.properties.dedicated_date.format('YYYY-MM-DD'));
 		}
 		return this;
 	}
@@ -117,9 +118,11 @@ class Ticket extends BasicDocument {
 		return this;
 	}
 
-	appendLabel(lbl) {
-		console.log("LABEL==================================>>\n", this.get('label'), lbl);
-		this.set('label', this.get('label') + (lbl || ""));
+	modifyLabel(lbl, method = 'append') {
+		let new_label = this.get('label');
+		(method == "append") && (new_label = new_label + (lbl || ""));
+		(method == "prepend") && (new_label = (lbl || "") + new_label);
+		this.set('label', new_label);
 	}
 
 	//ticket-session orchestrator requirements
