@@ -39,7 +39,7 @@ class GlobalMembershipDescription extends AtomicCounter {
 			"organization": organization,
 			"role": role
 		});
-
+		this.is_changed = true;
 		return patchwerk.save(this)
 	}
 	inc() {
