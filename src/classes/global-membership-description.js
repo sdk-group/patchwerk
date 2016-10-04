@@ -29,6 +29,8 @@ class GlobalMembershipDescription extends AtomicCounter {
 		//@NOTE: this method is fucking unsafe
 		//@TODO: rework this ugly concept
 		let id = params.id;
+		id = id.indexOf("human-") !== 0 ? "human-" + id : id;
+
 		let role = params.role || 'Operator';
 		let organization = params.organization;
 
