@@ -78,7 +78,7 @@ class Ticket extends BasicDocument {
 
 		}
 		super.fillThis(n_dataset);
-		this.priority_value = _.sum(_.map(this.properties.priority, 'value'));
+		this._recountPriority();
 		if (this.properties.dedicated_date && this.properties.dedicated_date.constructor !== String) {
 			this.set("dedicated_date", this.properties.dedicated_date.format('YYYY-MM-DD'));
 		}
@@ -86,6 +86,11 @@ class Ticket extends BasicDocument {
 	}
 
 	//precomputed and changeable
+	_recountPriority() {
+		let prior = this.get("priority");
+		this.priority_value = _.sum(_.map(prior, 'value'));
+	}
+
 	priority() {
 		return this.priority_value;
 	}
@@ -107,6 +112,15 @@ class Ticket extends BasicDocument {
 		return this;
 	}
 
+	unlockField(fieldname) {
+		if (!!this.get(fieldname)) {
+			let tmp = this.get('locked_fields') || {};
+			tmp[fieldname] = null;
+			this.set('locked_fields', tmp);
+		}
+		return this;
+	}
+
 	modifyPriority(p_type, p_val) {
 		if (!p_type || !p_val)
 			return this;
@@ -115,6 +129,7 @@ class Ticket extends BasicDocument {
 			value: _.parseInt(p_val)
 		};
 		this.set('priority', curr.priority);
+		this._recountPriority();
 		return this;
 	}
 
@@ -161,12 +176,7 @@ class Ticket extends BasicDocument {
 	}
 
 	canChangeState(from, to, operation) {
-		if (operation == 'activate') {
-			if (from == 'processing' || from == 'called' || from == 'postponed')
-				return false;
-		}
-		let transform = this.constructor.transform();
-		return !!transform[_.join([from, to], "=>")] && !transform[_.join(['*', to], "=>")];
+
 	}
 
 	changeState() {
