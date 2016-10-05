@@ -3,6 +3,8 @@
 let BasicDocument = require('./basic.js');
 
 const ticket_schema = {
+	"inheritance_level": Number,
+	"inherits": String,
 	'label': String,
 	'session': String,
 	'locked_fields': Object,
