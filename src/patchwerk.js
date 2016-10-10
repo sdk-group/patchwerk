@@ -42,7 +42,8 @@ class Patchwerk {
 	save(model, query = {}) {
 		let is_changed = model.isChanged();
 
-		if (!is_changed) return Promise.resolve(true);
+		//@TODO: uncomment it later
+		// if (!is_changed) return Promise.resolve(true);
 
 		return this._complete(model, query)
 			.then(completeModel => completeModel.getSource())
