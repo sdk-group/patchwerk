@@ -56,8 +56,6 @@ class BasicDocument {
 
 		if (!owner) throw new Error('No such property');
 
-		if (owner.properties[name] === value) return this;
-
 		owner.properties[name] = value;
 		this.is_changed = true;
 
