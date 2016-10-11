@@ -197,6 +197,7 @@ class Ticket extends BasicDocument {
 			if (ticket_schema[key])
 				this.set(key, data[key]);
 		}
+		this._recountPriority();
 	}
 
 	appendHistory(entry) {
