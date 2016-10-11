@@ -199,6 +199,13 @@ class Ticket extends BasicDocument {
 		}
 	}
 
+	appendHistory(entry) {
+		let hst = this.get("history") || [];
+		hst.push(entry);
+		this.set("history", hst)
+		return this;
+	}
+
 }
 
 module.exports = Ticket;
