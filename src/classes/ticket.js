@@ -169,13 +169,20 @@ class Ticket extends BasicDocument {
 
 	//state fns
 	isActive() {
-		return this.properties.state == 'called' || this.properties.state == 'processing';
+		let state = this.get("state");
+		return state == 'called' || state == 'processing';
 	}
 
 	isProcessed() {
-		return this.properties.state != 'registered' &&
-			this.properties.state != 'booked' &&
-			this.properties.state != 'postponed';
+		let state = this.get("state");
+		return state != 'registered' &&
+			state != 'booked' &&
+			state != 'postponed';
+	}
+
+	isInactive() {
+		let state = this.get("state");
+		return state == 'closed' || state == 'expired';
 	}
 
 	canChangeState(from, to, operation) {
