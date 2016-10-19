@@ -5,7 +5,7 @@ let AtomicCounter = require('./atomic-counter.js');
 class WorkstationCounter extends AtomicCounter {
 	static description() {
 		return {
-			"key": "cache_workstations_{department}"
+			"key": "registry_workstation_{department}"
 		}
 	}
 	range() {
