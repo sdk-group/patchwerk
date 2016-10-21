@@ -11,7 +11,7 @@ class WorkstationCounter extends AtomicCounter {
 	range() {
 		let type = this.creation_params.type || 'control-panel';
 
-		return type.constructor === Array ? _.flatMap(_.pick(this.properties, type)) : _.get(this.properties, ['content', type]);
+		return type.constructor === Array ? _.flatMap(_.pick(this.properties.content, type)) : _.get(this.properties, ['content', type]);
 	}
 }
 
