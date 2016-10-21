@@ -6,7 +6,7 @@ const AtomicCounter = require('./atomic-counter.js');
 class ServiceCounter extends AtomicCounter {
 	static description() {
 		return {
-			"key": "registry_service"
+			"key": "registry_service_{department}"
 		}
 	}
 	range() {
