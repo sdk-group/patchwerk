@@ -3,6 +3,7 @@
 let BasicDocument = require('./basic.js');
 
 const ticket_schema = {
+	"pack_member": Boolean,
 	"inheritance_counter": Number,
 	"inheritance_level": Number,
 	"inherits": String,
@@ -131,7 +132,7 @@ class Ticket extends BasicDocument {
 		curr[p_type] = {
 			value: _.parseInt(p_val)
 		};
-		this.set('priority', curr.priority);
+		this.set('priority', curr);
 		this._recountPriority();
 		return this;
 	}
