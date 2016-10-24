@@ -14,6 +14,7 @@ const ticket_schema = {
 	'source': String,
 	"qa_answers": Object,
 	'time_description': Number,
+	'initial_time_description': Number,
 	'operator': String,
 	'alt_operator': Array,
 	'history': Array,
@@ -202,7 +203,7 @@ class Ticket extends BasicDocument {
 			key;
 		while (l--) {
 			key = keys[l];
-			if (ticket_schema[key])
+			if (ticket_schema[key] && data[key] != this.get(key))
 				this.set(key, data[key]);
 		}
 		this._recountPriority();
