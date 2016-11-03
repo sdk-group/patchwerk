@@ -184,7 +184,7 @@ class Ticket extends BasicDocument {
 
 	isInactive() {
 		let state = this.get("state");
-		return state == 'closed' || state == 'expired';
+		return state == 'closed' || state == 'expired' || state == 'removed';
 	}
 
 	canChangeState(from, to, operation) {
