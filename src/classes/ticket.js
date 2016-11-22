@@ -187,14 +187,6 @@ class Ticket extends BasicDocument {
 		return state == 'closed' || state == 'expired' || state == 'removed';
 	}
 
-	canChangeState(from, to, operation) {
-
-	}
-
-	changeState() {
-
-	}
-
 	//update
 	update(data) {
 		//@FIXIT make this less ugly
