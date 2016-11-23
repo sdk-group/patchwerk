@@ -1,6 +1,6 @@
 'use strict'
 
-let BasicDocument = require('./basic.js');
+let BasicDocument = require('./shapeshifter.js');
 
 //meh
 const schema = {
@@ -15,7 +15,10 @@ const schema = {
 	"device_type": String,
 	"digital_display_address": String,
 	"device_placement": String,
-	"state": String
+	"state": String,
+	"label": String,
+	"short_label": String,
+	"description": String
 };
 
 const schema_keys = Object.keys(schema);
@@ -27,6 +30,38 @@ class Workstation extends BasicDocument {
 			"counter": "workstation-counter"
 		};
 	}
+
+
+	static schema() {
+		return schema;
+	}
+
+	static keys() {
+		return schema_keys;
+	}
+
+  // fillThis(dataset) {
+  //  let keys = this.constructor.keys(),
+  //    l = keys.length,
+  //    tmp;
+  //  let n_dataset = {};
+  //  if (dataset[this.id].value) {
+  //    let data = {};
+  //    while (l--) {
+  //      tmp = dataset[this.id].value[keys[l]];
+  //      data[keys[l]] = tmp === undefined ? null : tmp;
+  //    }
+  //    data.occupied_by = data.occupied_by || [];
+  //    n_dataset[this.id] = {
+  //      value: data
+  //    };
+
+  //  }
+  //  super.fillThis(n_dataset);
+  //  return this;
+  // }
+
+
 	attachService(services) {
 		let provides = this.get('provides');
 
@@ -38,10 +73,11 @@ class Workstation extends BasicDocument {
 	//like getSource, but contrdirected
 	//@TODO this method should disappear later
 	serialize() {
-		let l = schema_keys.length;
+		let keys = this.constructor.keys(),
+			l = keys.length;
 		let res = {};
 		while (l--) {
-			res[schema_keys[l]] = this.properties[schema_keys[l]];
+			res[keys[l]] = this.properties[keys[l]];
 		}
 
 		res.id = this.id;
@@ -60,7 +96,7 @@ class Workstation extends BasicDocument {
 		occupation = _.castArray(occupation);
 		if (this.get("device_type") == 'control-panel') {
 			if (!_.isEmpty(occupation) && !~_.indexOf(occupation, user))
-				throw new Error(`Workstation ${workstation} is already occupied by agents ${occupation}.`);
+				throw new Error(`Workstation ${this.id} is already occupied by agents ${occupation}.`);
 		}
 		this.set("occupied_by", _.uniq(_.concat(occupation, user)));
 		this.getActive();
