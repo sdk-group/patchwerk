@@ -1,6 +1,6 @@
 'use strict'
 
-let BasicDocument = require('./shapeshifter.js');
+let BasicDocument = require('./basic.js');
 
 //meh
 const schema = {
@@ -40,26 +40,26 @@ class Workstation extends BasicDocument {
 		return schema_keys;
 	}
 
-  // fillThis(dataset) {
-  //  let keys = this.constructor.keys(),
-  //    l = keys.length,
-  //    tmp;
-  //  let n_dataset = {};
-  //  if (dataset[this.id].value) {
-  //    let data = {};
-  //    while (l--) {
-  //      tmp = dataset[this.id].value[keys[l]];
-  //      data[keys[l]] = tmp === undefined ? null : tmp;
-  //    }
-  //    data.occupied_by = data.occupied_by || [];
-  //    n_dataset[this.id] = {
-  //      value: data
-  //    };
+	// fillThis(dataset) {
+	//  let keys = this.constructor.keys(),
+	//    l = keys.length,
+	//    tmp;
+	//  let n_dataset = {};
+	//  if (dataset[this.id].value) {
+	//    let data = {};
+	//    while (l--) {
+	//      tmp = dataset[this.id].value[keys[l]];
+	//      data[keys[l]] = tmp === undefined ? null : tmp;
+	//    }
+	//    data.occupied_by = data.occupied_by || [];
+	//    n_dataset[this.id] = {
+	//      value: data
+	//    };
 
-  //  }
-  //  super.fillThis(n_dataset);
-  //  return this;
-  // }
+	//  }
+	//  super.fillThis(n_dataset);
+	//  return this;
+	// }
 
 
 	attachService(services) {
@@ -120,7 +120,6 @@ class Workstation extends BasicDocument {
 	getPaused() {
 		this.set("state", "paused");
 	}
-
 }
 
 module.exports = Workstation;

@@ -10,15 +10,13 @@ const schema = {
 	"default_agent": String,
 	'attached_to': String,
 	"device_type": String,
-	"occupied_by": Array,
 	"hold_screen_design": String,
-	"parent": String,
-	"backdrop_design": String
+	"parent": String
 };
 
 const schema_keys = Object.keys(schema);
 
-class OperatorDisplay extends Workstation {
+class Qa extends Workstation {
 	static description() {
 		return {
 			"key": "{counter}",
@@ -35,7 +33,7 @@ class OperatorDisplay extends Workstation {
 	}
 
 	attachService(services) {
-		throw new Error("It is an operator display!");
+		throw new Error("It is a qa!");
 	}
 
 	occupy(user) {
@@ -51,4 +49,4 @@ class OperatorDisplay extends Workstation {
 
 }
 
-module.exports = OperatorDisplay;
+module.exports = Qa;

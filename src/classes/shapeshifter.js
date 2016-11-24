@@ -13,9 +13,8 @@ class Shapeshifter extends BasicDocument {
 	}
 
 	pickData(dataset) {
+		console.log(dataset);
 		let definition = dataset && dataset[this.id] && dataset[this.id].value && dataset[this.id].value['@type'];
-		if (_.kebabCase(definition) == _.kebabCase(this.constructor.name))
-			return super.pickData(dataset);
 
 		let Model = discover(definition);
 		let obj = new Model(this.keymap);

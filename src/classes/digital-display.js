@@ -43,7 +43,7 @@ class DigitalDisplay extends Workstation {
 	}
 
 	attachService(services) {
-		throw new Error("It is a terminal!");
+		throw new Error("It is a digital display!");
 	}
 
 	occupy(user) {
