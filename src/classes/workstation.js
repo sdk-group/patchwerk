@@ -109,6 +109,11 @@ class Workstation extends BasicDocument {
 			this.getInactive();
 	}
 
+	clear() {
+		this.set("occupied_by", []);
+		this.getInactive();
+	}
+
 	getActive() {
 		this.set("state", "active");
 	}
