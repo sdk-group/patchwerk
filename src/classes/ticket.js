@@ -27,28 +27,10 @@ const ticket_schema = {
 	"priority": Object,
 	"state": String,
 	"user_info": Object,
+	"user_info_description": Object,
 	"service_count": Number,
 	"called": Number,
 	"expiry": Number
-};
-
-const transform_schema = {
-	"registered=>called": true,
-	"registered=>removed": true,
-	"registered=>registered": true,
-	"postponed=>called": true,
-	"postponed=>registered": true,
-	"booked=>registered": true,
-	"booked=>removed": true,
-	"booked=>expired": true,
-	"called=>removed": true,
-	"called=>registered": true,
-	"called=>expired": true,
-	"called=>processing": true,
-	"called=>postponed": true,
-	"processing=>closed": true,
-	"processing=>postponed": true,
-	"processing=>registered": true
 };
 
 let ticket_schema_keys = Object.keys(ticket_schema);
@@ -61,9 +43,6 @@ class Ticket extends BasicDocument {
 		};
 	}
 
-	static transform() {
-		return transform_schema;
-	}
 
 	fillThis(dataset) {
 		let l = ticket_schema_keys.length,
