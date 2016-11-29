@@ -13,7 +13,7 @@ class Shapeshifter extends BasicDocument {
 	}
 
 	pickData(dataset) {
-		console.log(dataset);
+		// console.log(dataset);
 		let definition = dataset && dataset[this.id] && dataset[this.id].value && dataset[this.id].value['@type'];
 
 		let Model = discover(definition);
