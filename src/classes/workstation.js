@@ -125,6 +125,10 @@ class Workstation extends BasicDocument {
 	getPaused() {
 		this.set("state", "paused");
 	}
+
+	is(state) {
+		return this.get("state") == state;
+	}
 }
 
 module.exports = Workstation;
