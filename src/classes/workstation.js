@@ -7,6 +7,7 @@ const schema = {
 	"attached_terminal": String,
 	"occupied_by": Array,
 	"provides": Array,
+	"filtering_method": Array,
 	"has_schedule": Object,
 	"default_agent": String,
 	"attached_to": String,
