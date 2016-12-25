@@ -136,10 +136,11 @@ class Ticket extends BasicDocument {
 	//like getSource, but contrdirected
 	//@TODO this method should disappear later
 	serialize() {
+		// console.log("SERIALIZING");
 		let l = ticket_schema_keys.length;
 		let res = {};
 		while (l--) {
-			res[ticket_schema_keys[l]] = this.properties[ticket_schema_keys[l]];
+			res[ticket_schema_keys[l]] = _.cloneDeep(this.properties[ticket_schema_keys[l]]);
 		}
 
 		res.id = this.id;
