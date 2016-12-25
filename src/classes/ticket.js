@@ -187,7 +187,11 @@ class Ticket extends BasicDocument {
 		this.set("history", hst)
 		return this;
 	}
-
+	restoreTimeDescription() {
+		let td = this.get("initial_time_description");
+		td = (td.constructor == Array) ? td.slice() : td;
+		this.set("time_description", td);
+	}
 }
 
 module.exports = Ticket;
