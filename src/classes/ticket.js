@@ -192,6 +192,21 @@ class Ticket extends BasicDocument {
 		td = (td.constructor == Array) ? td.slice() : td;
 		this.set("time_description", td);
 	}
+
+	setLastOperation(op) {
+		this.last_operation = op;
+	}
+	getLastOperation() {
+		return this.last_operation;
+	}
+	checkOperationInterference(op) {
+		let lastop = this.getLastOperation();
+		if (!lastop || !lastop.start || !lastop.end)
+			return false;
+		if (!op || !op.start || !op.end)
+			return false;
+		return (lastop.start <= op.start && lastop.end >= op.start && lastop.end <= op.end);
+	}
 }
 
 module.exports = Ticket;
